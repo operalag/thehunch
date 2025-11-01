@@ -2,52 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 220 25% 8%;
-    --foreground: 0 0% 98%;
+    /* Primary Colors */
+    --ton-blue: 199 100% 46%;
+    --primary-dark: 199 100% 37%;
+    --primary-light: 199 88% 56%;
 
-    --card: 220 20% 12%;
-    --card-foreground: 0 0% 98%;
+    /* Secondary Colors */
+    --navy: 216 56% 10%;
+    --dark-gray: 215 25% 15%;
+    --medium-gray: 215 20% 55%;
+    --light-gray: 210 40% 96%;
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 0 0% 98%;
+    /* Accent Colors */
+    --accent-green: 160 84% 39%;
+    --accent-purple: 258 90% 66%;
+    --accent-orange: 38 92% 50%;
 
-    --primary: 200 100% 40%;
-    --primary-foreground: 0 0% 100%;
+    /* Semantic Colors */
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --info: 199 100% 46%;
+
+    /* Backgrounds */
+    --bg-primary: 0 0% 100%;
+    --bg-secondary: 210 40% 98%;
+    --bg-dark: 222 47% 11%;
+
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
     
-    --primary-glow: 200 100% 60%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --secondary: 180 100% 35%;
-    --secondary-foreground: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --muted: 220 20% 20%;
-    --muted-foreground: 220 15% 65%;
+    --primary: 199 100% 46%;
+    --primary-foreground: 0 0% 100%;
 
-    --accent: 180 100% 50%;
-    --accent-foreground: 220 25% 8%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 20% 55%;
 
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 200 100% 50%;
+    --accent: 199 100% 46%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 199 100% 46%;
 
     --radius: 0.75rem;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(200 100% 40%), hsl(180 100% 50%));
-    --gradient-hero: linear-gradient(180deg, hsl(220 25% 8%), hsl(220 30% 12%));
-    --gradient-card: linear-gradient(135deg, hsl(220 20% 14%), hsl(220 18% 18%));
-    
-    --shadow-glow: 0 0 30px hsl(200 100% 40% / 0.3);
-    --shadow-card: 0 10px 40px hsl(220 30% 5% / 0.5);
-    
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -64,36 +76,68 @@ All colors MUST be HSL.
   .font-mono {
     font-family: 'JetBrains Mono', 'Courier New', monospace;
   }
+
+  h1 {
+    @apply text-5xl md:text-[3.5rem] font-extrabold leading-tight;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl font-bold leading-tight;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl font-bold leading-snug;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl font-bold;
+  }
 }
 
 @layer utilities {
-  .gradient-primary {
-    background: var(--gradient-primary);
-  }
-  
-  .gradient-hero {
-    background: var(--gradient-hero);
-  }
-  
-  .gradient-card {
-    background: var(--gradient-card);
-  }
-  
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
-  }
-  
-  .shadow-card {
-    box-shadow: var(--shadow-card);
-  }
-  
-  .transition-smooth {
-    transition: var(--transition-smooth);
-  }
-  
   .glass {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .gradient-blue-purple {
+    background: linear-gradient(135deg, hsl(var(--ton-blue)), hsl(var(--accent-purple)));
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--ton-blue)), hsl(var(--accent-purple)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.8s ease-out;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

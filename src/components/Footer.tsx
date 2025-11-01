@@ -1,151 +1,67 @@
-import { MessageCircle, Twitter, Github, FileText } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Link } from 'react-router-dom';
+import { Github, MessageCircle, Send, Twitter } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-card/50 backdrop-blur-lg">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+    <footer className="bg-navy text-white py-12">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center font-bold text-xl">
-                H
-              </div>
-              <span className="font-bold text-xl">Hunch Oracle</span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Fast, secure decentralized oracle on TON blockchain
-            </p>
-            <div className="flex gap-3">
-              <Button 
-                size="icon" 
-                variant="ghost"
-                onClick={() => window.open('https://t.me/hunchoracle', '_blank')}
-              >
-                <MessageCircle size={20} />
-              </Button>
-              <Button 
-                size="icon" 
-                variant="ghost"
-                onClick={() => window.open('https://twitter.com/hunchoracle', '_blank')}
-              >
-                <Twitter size={20} />
-              </Button>
-              <Button 
-                size="icon" 
-                variant="ghost"
-                onClick={() => window.open('https://github.com/hunchoracle', '_blank')}
-              >
-                <Github size={20} />
-              </Button>
-            </div>
+            <h3 className="text-2xl font-extrabold mb-2">HUNCH</h3>
+            <p className="text-sm text-white/70 mb-4">Oracle Infrastructure for TON</p>
+            <p className="text-xs text-white/50">© {currentYear} Hunch Protocol. All rights reserved.</p>
           </div>
 
           {/* Product */}
           <div>
-            <h4 className="font-bold mb-4">Product</h4>
-            <ul className="space-y-3">
-              <li>
-                <button 
-                  onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  How It Works
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Features
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => document.getElementById('calculators')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Calculators
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => document.getElementById('token')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Token
-                </button>
-              </li>
+            <h4 className="text-sm uppercase font-semibold mb-4 text-white/70">Product</h4>
+            <ul className="space-y-2">
+              <li><Link to="/technology" className="text-sm hover:text-primary transition-colors">Technology</Link></li>
+              <li><Link to="/tokenomics" className="text-sm hover:text-primary transition-colors">Tokenomics</Link></li>
+              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-primary transition-colors">Documentation</a></li>
+              <li><a href="#roadmap" className="text-sm hover:text-primary transition-colors">Roadmap</a></li>
             </ul>
           </div>
 
-          {/* Developers */}
+          {/* Community */}
           <div>
-            <h4 className="font-bold mb-4">Developers</h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  API Reference
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  SDK
-                </a>
-              </li>
+            <h4 className="text-sm uppercase font-semibold mb-4 text-white/70">Community</h4>
+            <ul className="space-y-2">
+              <li><a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-primary transition-colors">Discord</a></li>
+              <li><a href="https://t.me" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-primary transition-colors">Telegram</a></li>
+              <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-primary transition-colors">Twitter/X</a></li>
+              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-primary transition-colors">GitHub</a></li>
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Company */}
           <div>
-            <h4 className="font-bold mb-4">Stay Updated</h4>
-            <p className="text-sm text-muted-foreground mb-4">
-              Get the latest updates on Hunch Oracle
-            </p>
-            <div className="flex gap-2">
-              <Input 
-                type="email" 
-                placeholder="your@email.com"
-                className="bg-background/50"
-              />
-              <Button className="gradient-primary">
-                Subscribe
-              </Button>
-            </div>
+            <h4 className="text-sm uppercase font-semibold mb-4 text-white/70">Company</h4>
+            <ul className="space-y-2">
+              <li><Link to="/community" className="text-sm hover:text-primary transition-colors">About</Link></li>
+              <li><a href="#" className="text-sm hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="text-sm hover:text-primary transition-colors">Privacy Policy</a></li>
+            </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {currentYear} Hunch Oracle. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Terms of Service
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Cookie Policy
-            </a>
-          </div>
+        {/* Social Icons */}
+        <div className="flex justify-center space-x-6 pt-8 border-t border-white/10">
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-primary transition-colors">
+            <Twitter className="h-6 w-6" />
+          </a>
+          <a href="https://t.me" target="_blank" rel="noopener noreferrer" className="text-white hover:text-primary transition-colors">
+            <Send className="h-6 w-6" />
+          </a>
+          <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-primary transition-colors">
+            <MessageCircle className="h-6 w-6" />
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-primary transition-colors">
+            <Github className="h-6 w-6" />
+          </a>
         </div>
       </div>
     </footer>

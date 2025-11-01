@@ -1,15 +1,18 @@
 import { motion } from 'framer-motion';
+import { Calendar, FileText, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
-import { Clock, Shield, Zap } from 'lucide-react';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 pb-20">
       {/* Animated Background */}
-      <div className="absolute inset-0 gradient-hero">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+          {/* Network nodes */}
+          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-primary/20 blur-3xl animate-float" />
+          <div className="absolute top-40 right-20 w-40 h-40 rounded-full bg-purple-400/20 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-32 left-1/4 w-36 h-36 rounded-full bg-primary/20 blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+          <div className="absolute bottom-20 right-1/3 w-28 h-28 rounded-full bg-purple-400/20 blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         </div>
       </div>
 
@@ -20,95 +23,72 @@ const Hero = () => {
           transition={{ duration: 0.8 }}
           className="text-center max-w-5xl mx-auto"
         >
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass mb-8"
-          >
-            <Zap size={16} className="text-accent" />
-            <span className="text-sm font-medium">80% Complete • Testnet Live</span>
-          </motion.div>
-
           {/* Main Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary-glow to-accent bg-clip-text text-transparent"
-          >
-            Resolve Events in Hours, Not Days
-          </motion.h1>
+          <h1 className="gradient-text mb-6 animate-fade-up">
+            The First Optimistic Oracle
+            <br />
+            for TON Blockchain
+          </h1>
 
+          {/* Subheadline */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto"
+            transition={{ delay: 0.3 }}
+            className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed"
           >
-            The fastest decentralized oracle on TON. Secure markets up to $248K with escalating bonds. 
-            Earn up to 42% APY staking $HNCH tokens.
+            Real-time data feeds for 900M Telegram users. Fast oracle resolution with economic finality. 
+            Built for prediction markets, DeFi, gaming, and real-world applications.
           </motion.p>
-
-          {/* Key Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-3xl mx-auto"
-          >
-            <div className="glass p-6 rounded-xl">
-              <Clock className="w-8 h-8 text-primary mb-3 mx-auto" />
-              <div className="text-3xl font-bold font-mono text-primary mb-1">3-6h</div>
-              <div className="text-sm text-muted-foreground">Resolution Time</div>
-            </div>
-            <div className="glass p-6 rounded-xl">
-              <Shield className="w-8 h-8 text-accent mb-3 mx-auto" />
-              <div className="text-3xl font-bold font-mono text-accent mb-1">$248K</div>
-              <div className="text-sm text-muted-foreground">Market Security</div>
-            </div>
-            <div className="glass p-6 rounded-xl">
-              <Zap className="w-8 h-8 text-primary mb-3 mx-auto" />
-              <div className="text-3xl font-bold font-mono text-primary mb-1">14-42%</div>
-              <div className="text-sm text-muted-foreground">Staking APY</div>
-            </div>
-          </motion.div>
 
           {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
           >
             <Button 
               size="lg"
-              onClick={() => window.open('https://t.me/hunchoracle', '_blank')}
-              className="gradient-primary text-lg px-8 py-6 shadow-glow hover:scale-105 transition-smooth"
+              className="bg-primary hover:bg-primary-dark text-white px-10 py-6 text-lg shadow-xl hover:scale-105 transition-transform"
             >
-              Launch on Telegram
+              <Calendar className="mr-2 h-5 w-5" />
+              Schedule Investor Call
             </Button>
             <Button 
               size="lg"
               variant="outline"
-              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-              className="border-primary text-primary hover:bg-primary/10 text-lg px-8 py-6 transition-smooth"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-10 py-6 text-lg transition-all"
             >
-              Learn How It Works
+              <FileText className="mr-2 h-5 w-5" />
+              Read Technical Docs
             </Button>
           </motion.div>
 
+          {/* Tertiary CTA */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="text-sm text-muted-foreground mt-8"
+            transition={{ delay: 0.7 }}
+            className="text-sm text-muted-foreground"
           >
-            Trusted by prediction markets • Powered by TON blockchain
+            <a href="#community" className="hover:text-primary transition-colors underline">
+              Join 2,000+ community members on Discord →
+            </a>
           </motion.p>
         </motion.div>
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
+      >
+        <span className="text-sm text-muted-foreground mb-2">Scroll to explore</span>
+        <ChevronDown className="h-6 w-6 text-primary animate-bounce" />
+      </motion.div>
     </section>
   );
 };
