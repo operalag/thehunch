@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Shield, Network, Zap } from 'lucide-react';
+import kangarooNetwork from '@/assets/kangaroo-network.png';
 
 const AboutSection = () => {
   const pillars = [
@@ -24,8 +25,23 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="about" className="py-32 bg-[hsl(var(--deep-navy))]">
-      <div className="container-custom">
+    <section id="about" className="py-32 relative overflow-hidden">
+      {/* Decorative kangaroo */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 0.08, scale: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-auto pointer-events-none"
+        style={{
+          backgroundImage: `url(${kangarooNetwork})`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          aspectRatio: '1',
+        }}
+      />
+      <div className="container-custom relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

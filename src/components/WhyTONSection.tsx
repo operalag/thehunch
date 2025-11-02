@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
+import gridPattern from '@/assets/grid-pattern.png';
 
 const WhyTONSection = () => {
   const reasons = [
@@ -78,12 +79,13 @@ const WhyTONSection = () => {
             viewport={{ once: true }}
             className="lg:col-span-2"
           >
-            <div className="glass-light rounded-2xl p-10 border border-white/5 h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">💎</div>
-                <p className="text-[hsl(var(--electric-cyan))] font-bold text-2xl">TON Blockchain</p>
-                <p className="text-[hsl(var(--soft-gray))] mt-2">Infinite Sharding Architecture</p>
-              </div>
+            <div className="glass-light rounded-2xl overflow-hidden relative h-96">
+              <img 
+                src={gridPattern} 
+                alt="Network visualization" 
+                className="w-full h-full object-cover opacity-80"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--deep-navy))] via-transparent to-transparent" />
             </div>
           </motion.div>
         </div>

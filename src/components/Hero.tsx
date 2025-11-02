@@ -1,11 +1,22 @@
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
+import heroVisual from '@/assets/hero-visual.png';
 
 const Hero = ({ onJoinWaitlist }: { onJoinWaitlist: () => void }) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center">
-      <div className="absolute inset-0 bg-gradient-to-b from-[hsl(var(--deep-navy))] to-[hsl(var(--deep-navy))]" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background with hero visual */}
+      <div className="absolute inset-0 bg-[hsl(var(--deep-navy))]" />
+      <div 
+        className="absolute inset-0 opacity-40 bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${heroVisual})`,
+          backgroundBlendMode: 'lighten',
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[hsl(var(--deep-navy))]/60 to-[hsl(var(--deep-navy))]" />
+      
       <div className="relative z-10 container-custom text-center py-32">
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="text-gradient mb-6">
           Truth, delivered.

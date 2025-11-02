@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, Target, Umbrella, Gamepad2, UserCheck, Cpu } from 'lucide-react';
+import circuitVisual from '@/assets/circuit-visual.png';
 
 const UseCasesSection = () => {
   const useCases = [
@@ -42,8 +43,17 @@ const UseCasesSection = () => {
   ];
 
   return (
-    <section className="py-32 bg-[hsl(var(--slate-gray))]">
-      <div className="container-custom">
+    <section 
+      className="py-32 relative"
+      style={{
+        backgroundImage: `url(${circuitVisual})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundBlendMode: 'overlay',
+      }}
+    >
+      <div className="absolute inset-0 bg-[hsl(var(--slate-gray))]/90" />
+      <div className="container-custom relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

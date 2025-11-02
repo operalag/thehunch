@@ -7,7 +7,7 @@ import WhyTONSection from '@/components/WhyTONSection';
 import UseCasesSection from '@/components/UseCasesSection';
 import StealthModeSection from '@/components/StealthModeSection';
 import CommunitySection from '@/components/CommunitySection';
-import FAQSection from '@/components/FAQSection';
+
 import Footer from '@/components/Footer';
 import WaitlistModal from '@/components/WaitlistModal';
 
@@ -24,7 +24,6 @@ const Index = () => {
       <UseCasesSection />
       <StealthModeSection />
       <CommunitySection />
-      <FAQSection />
       <Footer onJoinWaitlist={() => setWaitlistOpen(true)} />
       <WaitlistModal open={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
     </div>

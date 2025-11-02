@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import logo from '@/assets/hunch-logo.png';
@@ -11,10 +12,11 @@ const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Network', href: '#how-it-works' },
-    { name: 'Why TON', href: '#why-ton' },
-    { name: 'Community', href: '#community' },
+    { name: 'About', href: '#about', type: 'scroll' },
+    { name: 'Network', href: '#how-it-works', type: 'scroll' },
+    { name: 'Why TON', href: '#why-ton', type: 'scroll' },
+    { name: 'Community', href: '#community', type: 'scroll' },
+    { name: 'FAQ', href: '/faq', type: 'link' },
   ];
 
   const handleNavClick = (href: string) => {
@@ -37,14 +39,24 @@ const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
-                className="text-sm font-medium text-foreground hover:text-[hsl(var(--electric-cyan))] transition-colors"
-              >
-                {link.name}
-              </a>
+              link.type === 'link' ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-sm font-medium text-foreground hover:text-[hsl(var(--electric-cyan))] transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
+                  className="text-sm font-medium text-foreground hover:text-[hsl(var(--electric-cyan))] transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
             ))}
           </nav>
 
@@ -74,14 +86,25 @@ const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
         <div className="md:hidden glass-light border-t border-white/5">
           <nav className="container-custom py-4 flex flex-col space-y-4">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
-                className="text-sm font-medium text-foreground hover:text-[hsl(var(--electric-cyan))] transition-colors"
-              >
-                {link.name}
-              </a>
+              link.type === 'link' ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-sm font-medium text-foreground hover:text-[hsl(var(--electric-cyan))] transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => { e.preventDefault(); handleNavClick(link.href); }}
+                  className="text-sm font-medium text-foreground hover:text-[hsl(var(--electric-cyan))] transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
             ))}
             <Button 
               onClick={() => { setMobileMenuOpen(false); onJoinWaitlist(); }}
