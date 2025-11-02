@@ -24,17 +24,13 @@ const WhyTONSection = () => {
 
   return (
     <section id="why-ton" className="py-32 bg-[hsl(var(--deep-navy))] relative overflow-hidden">
-      {/* Hexagonal Pattern Overlay */}
-      <div className="absolute inset-0 opacity-5">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hexagons" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
-              <polygon points="28,0 56,17 56,51 28,68 0,51 0,17" fill="none" stroke="white" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hexagons)" />
-        </svg>
-      </div>
+      {/* Subtle pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.344 0L13.858 8.485 15.272 9.9l7.9-7.9h-.828zm5.656 0l-8.485 8.485 1.414 1.414L28.828 0h-.828z' fill='%2300D4FF' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+        }}
+      />
 
       <div className="container-custom relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
@@ -79,13 +75,12 @@ const WhyTONSection = () => {
             viewport={{ once: true }}
             className="lg:col-span-2"
           >
-            <div className="glass-light rounded-2xl overflow-hidden relative h-96">
-              <img 
-                src={gridPattern} 
-                alt="Network visualization" 
-                className="w-full h-full object-cover opacity-80"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--deep-navy))] via-transparent to-transparent" />
+            <div className="glass-light rounded-2xl p-10 border border-white/5 h-96 flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-6xl mb-4">⚡</div>
+                <p className="text-[hsl(var(--electric-cyan))] font-bold text-2xl">TON Blockchain</p>
+                <p className="text-[hsl(var(--soft-gray))] mt-2">Infinite Sharding</p>
+              </div>
             </div>
           </motion.div>
         </div>
