@@ -4,140 +4,50 @@
 
 @layer base {
   :root {
-    /* Primary Colors */
-    --ton-blue: 199 100% 46%;
-    --primary-dark: 199 100% 37%;
-    --primary-light: 199 88% 56%;
-
-    /* Secondary Colors */
-    --navy: 216 56% 10%;
-    --dark-gray: 215 25% 15%;
-    --medium-gray: 215 20% 55%;
-    --light-gray: 210 40% 96%;
-
-    /* Accent Colors */
-    --accent-green: 160 84% 39%;
-    --accent-purple: 258 90% 66%;
-    --accent-orange: 38 92% 50%;
-
-    /* Semantic Colors */
-    --success: 160 84% 39%;
-    --warning: 38 92% 50%;
-    --error: 0 84% 60%;
-    --info: 199 100% 46%;
-
-    /* Backgrounds */
-    --bg-primary: 0 0% 100%;
-    --bg-secondary: 210 40% 98%;
-    --bg-dark: 222 47% 11%;
-
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --hunch-blue: 199 100% 40%;
+    --electric-cyan: 190 100% 50%;
+    --deep-navy: 215 60% 10%;
+    --slate-gray: 215 25% 17%;
+    --soft-gray: 215 15% 60%;
+    --oracle-purple: 258 82% 67%;
+    --success-green: 160 84% 48%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-
-    --primary: 199 100% 46%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --primary: var(--hunch-blue);
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 20% 55%;
-
-    --accent: 199 100% 46%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 199 100% 46%;
-
+    --secondary: var(--slate-gray);
+    --secondary-foreground: 0 0% 100%;
+    --accent: var(--electric-cyan);
+    --accent-foreground: 215 60% 10%;
+    --muted: var(--slate-gray);
+    --muted-foreground: var(--soft-gray);
+    --border: 0 0% 100% / 0.08;
+    --input: 0 0% 100% / 0.15;
+    --ring: var(--electric-cyan);
     --radius: 0.75rem;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
+  * { @apply border-border; }
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @apply bg-[hsl(var(--deep-navy))] text-foreground;
+    font-family: 'Inter', sans-serif;
   }
-  
-  .font-mono {
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-  }
-
-  h1 {
-    @apply text-5xl md:text-[3.5rem] font-extrabold leading-tight;
-  }
-
-  h2 {
-    @apply text-4xl md:text-5xl font-bold leading-tight;
-  }
-
-  h3 {
-    @apply text-2xl md:text-3xl font-bold leading-snug;
-  }
-
-  h4 {
-    @apply text-xl md:text-2xl font-bold;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
   }
 }
 
 @layer utilities {
-  .glass {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .gradient-blue-purple {
-    background: linear-gradient(135deg, hsl(var(--ton-blue)), hsl(var(--accent-purple)));
-  }
-
-  .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--ton-blue)), hsl(var(--accent-purple)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
-  }
-
-  .animate-fade-up {
-    animation: fadeUp 0.8s ease-out;
-  }
-
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  .glass { @apply bg-[hsl(var(--deep-navy))]/80 backdrop-blur-xl; }
+  .glass-light { @apply bg-white/5 backdrop-blur-md; }
+  .gradient-primary { background: linear-gradient(135deg, hsl(var(--hunch-blue)), hsl(var(--electric-cyan))); }
+  .text-gradient { @apply bg-clip-text text-transparent; background-image: linear-gradient(135deg, hsl(var(--hunch-blue)), hsl(var(--oracle-purple))); }
+  .glow-cyan { box-shadow: 0 0 20px hsl(var(--electric-cyan) / 0.3); }
+  .container-custom { @apply max-w-7xl mx-auto px-4 md:px-8; }
 }
+
+html { scroll-behavior: smooth; scroll-padding-top: 100px; }
