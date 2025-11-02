@@ -8,11 +8,8 @@ const StealthModeSection = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement email submission
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+  const handleJoinClick = () => {
+    window.open('https://t.me/hunch_oracle', '_blank');
   };
 
   const checklist = [
@@ -40,7 +37,7 @@ const StealthModeSection = () => {
           <h2 className="text-white mb-6">We're in stealth mode.</h2>
 
           <p className="text-lg text-[hsl(var(--soft-gray))] leading-relaxed mb-12">
-            hunch is being built by a team of cryptoeconomics researchers, distributed systems engineers, and Web3 veterans. We're moving fast and will share more soon.
+            HUNCH is being built by a team of cryptoeconomics researchers, distributed systems engineers, and Web3 veterans. We're moving fast and will share more soon.
             <br /><br />
             For now, here's what we're working on:
           </p>
@@ -64,22 +61,12 @@ const StealthModeSection = () => {
           <h3 className="text-white text-3xl font-semibold mb-6">Want early access?</h3>
 
           {!submitted ? (
-            <form onSubmit={handleSubmit} className="glass-light rounded-xl p-2 border border-white/10 max-w-xl mx-auto flex flex-col sm:flex-row gap-2">
-              <Input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="flex-1 bg-transparent border-none text-white placeholder:text-[hsl(var(--soft-gray))] focus-visible:ring-0 text-base"
-              />
-              <Button
-                type="submit"
-                className="gradient-primary text-white rounded-lg px-8 py-3 hover:glow-cyan transition-all whitespace-nowrap"
-              >
-                Join Waitlist
-              </Button>
-            </form>
+            <Button
+              onClick={handleJoinClick}
+              className="gradient-primary text-white rounded-lg px-10 py-4 hover:glow-cyan transition-all text-lg"
+            >
+              Join the Community
+            </Button>
           ) : (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}

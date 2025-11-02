@@ -33,7 +33,7 @@ const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <a href="#hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center">
-            <img src={logo} alt="hunch" className="h-10 md:h-12" />
+            <img src={logo} alt="HUNCH" className="h-10 md:h-12" />
           </a>
 
           {/* Desktop Navigation */}

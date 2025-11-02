@@ -13,7 +13,7 @@ const HowItWorksSection = () => {
       number: 2,
       icon: Search,
       title: 'Query',
-      description: 'hunch routes the request to multiple independent data providers staking collateral.',
+      description: 'HUNCH routes the request to multiple independent data providers staking collateral.',
     },
     {
       number: 3,
@@ -39,7 +39,7 @@ const HowItWorksSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-white mb-6">How hunch works</h2>
+          <h2 className="text-white mb-6">How HUNCH works</h2>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">

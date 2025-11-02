@@ -6,7 +6,7 @@ const WhyTONSection = () => {
   const reasons = [
     {
       title: 'Infinite Sharding',
-      description: "TON's sharding architecture means hunch can scale horizontally as demand grows—no bottlenecks.",
+      description: "TON's sharding architecture means HUNCH can scale horizontally as demand grows—no bottlenecks.",
     },
     {
       title: 'Sub-second Finality',

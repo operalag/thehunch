@@ -49,11 +49,11 @@ const AboutSection = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className="text-white mb-6">What is hunch?</h2>
+          <h2 className="text-white mb-6">What is HUNCH?</h2>
           <p className="text-lg md:text-xl text-[hsl(var(--soft-gray))] max-w-4xl mx-auto leading-relaxed">
             Blockchains are isolated by design. They can't access real-world data—prices, weather, sports scores, or any information living off-chain. That's where oracles come in.
             <br /><br />
-            hunch is building the most reliable oracle network on TON, connecting smart contracts to the data they need to power the next generation of decentralized applications.
+            HUNCH is building the most reliable oracle network on TON, connecting smart contracts to the data they need to power the next generation of decentralized applications.
           </p>
         </motion.div>
 
