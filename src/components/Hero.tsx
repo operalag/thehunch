@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
-import heroVisual from '@/assets/hero-visual.png';
+import heroAnimation from '@/assets/hero-animation.mp4';
 import { useTelegram } from '@/hooks/useTelegram';
 
 const Hero = () => {
@@ -33,6 +33,22 @@ const Hero = () => {
       />
       
       <div className="relative z-10 container-custom text-center py-32">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }} 
+          animate={{ opacity: 1, scale: 1 }} 
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mb-8 flex justify-center"
+        >
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="w-full max-w-md rounded-2xl"
+          >
+            <source src={heroAnimation} type="video/mp4" />
+          </video>
+        </motion.div>
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="text-gradient mb-6">
           {getGreeting()}
         </motion.h1>
