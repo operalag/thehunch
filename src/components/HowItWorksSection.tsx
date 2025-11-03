@@ -90,8 +90,8 @@ const HowItWorksSection = () => {
         >
           <p className="text-[hsl(var(--soft-gray))]">
             Want the technical details? They're coming soon.{' '}
-            <a href="#waitlist" className="text-[hsl(var(--electric-cyan))] underline hover:text-[hsl(var(--electric-cyan))]/80">
-              Join the waitlist
+            <a href="https://t.me/hunch_oracle" target="_blank" rel="noopener noreferrer" className="text-[hsl(var(--electric-cyan))] underline hover:text-[hsl(var(--electric-cyan))]/80">
+              Join our TG channel
             </a>
           </p>
         </motion.div>

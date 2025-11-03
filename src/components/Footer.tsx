@@ -1,6 +1,6 @@
 import logo from '@/assets/hunch-logo.png';
 
-const Footer = ({ onJoinWaitlist }: { onJoinWaitlist: () => void }) => {
+const Footer = () => {
   return (
     <footer className="bg-[hsl(var(--deep-navy))] border-t border-white/5 py-20 relative overflow-hidden">
       {/* Subtle pattern overlay */}

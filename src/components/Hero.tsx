@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import heroVisual from '@/assets/hero-visual.png';
 import { useTelegram } from '@/hooks/useTelegram';
 
-const Hero = ({ onJoinWaitlist }: { onJoinWaitlist: () => void }) => {
+const Hero = () => {
   const { user, isFromTelegram } = useTelegram();
   
   const getGreeting = () => {

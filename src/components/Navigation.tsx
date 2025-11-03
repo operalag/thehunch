@@ -4,11 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import logo from '@/assets/hunch-logo.png';
 
-interface NavigationProps {
-  onJoinWaitlist: () => void;
-}
-
-const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
+const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -65,10 +61,10 @@ const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
           {/* Desktop CTA */}
           <div className="hidden md:block">
             <Button 
-              onClick={onJoinWaitlist}
+              onClick={() => window.open('https://t.me/hunch_oracle', '_blank')}
               className="gradient-primary text-white rounded-lg px-8 hover:scale-105 hover:glow-cyan transition-all"
             >
-              Join Waitlist
+              Join TG Channel
             </Button>
           </div>
 
@@ -109,10 +105,10 @@ const Navigation = ({ onJoinWaitlist }: NavigationProps) => {
               )
             ))}
             <Button 
-              onClick={() => { setMobileMenuOpen(false); onJoinWaitlist(); }}
+              onClick={() => { setMobileMenuOpen(false); window.open('https://t.me/hunch_oracle', '_blank'); }}
               className="gradient-primary text-white rounded-lg w-full"
             >
-              Join Waitlist
+              Join TG Channel
             </Button>
           </nav>
         </div>

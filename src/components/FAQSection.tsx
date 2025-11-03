@@ -13,11 +13,11 @@ const FAQSection = () => {
     },
     {
       question: 'When is the token launching?',
-      answer: "We're not ready to share tokenomics details yet. Join the waitlist to be among the first to know when we announce.",
+      answer: "We're not ready to share tokenomics details yet. Join our Telegram channel to be among the first to know when we announce.",
     },
     {
       question: 'How can I become a data provider?',
-      answer: "We're currently onboarding a select group of initial data providers. If you have infrastructure and want to participate, join the waitlist and indicate your interest.",
+      answer: "We're currently onboarding a select group of initial data providers. If you have infrastructure and want to participate, join our Telegram channel and indicate your interest.",
     },
     {
       question: 'Is hunch open source?',

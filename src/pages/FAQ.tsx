@@ -2,16 +2,11 @@ import { motion } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import FAQSection from '@/components/FAQSection';
-import WaitlistModal from '@/components/WaitlistModal';
-import { useState } from 'react';
-import topoPattern from '@/assets/topo-pattern.png';
 
 const FAQ = () => {
-  const [waitlistOpen, setWaitlistOpen] = useState(false);
-
   return (
     <div className="min-h-screen">
-      <Navigation onJoinWaitlist={() => setWaitlistOpen(true)} />
+      <Navigation />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden bg-[hsl(var(--deep-navy))]">
@@ -41,8 +36,7 @@ const FAQ = () => {
       </section>
 
       <FAQSection />
-      <Footer onJoinWaitlist={() => setWaitlistOpen(true)} />
-      <WaitlistModal open={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
+      <Footer />
     </div>
   );
 };
