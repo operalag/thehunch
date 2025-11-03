@@ -580,7 +580,7 @@ const Whitepaper = () => {
           <div className="space-y-6">
             {[
               {
-                quarter: "Q4 2024",
+                quarter: "Q4 2025",
                 title: "Mainnet Launch",
                 items: [
                   "December 1st mainnet deployment",
@@ -590,7 +590,7 @@ const Whitepaper = () => {
                 ]
               },
               {
-                quarter: "Q1 2025",
+                quarter: "Q1 2026",
                 title: "Ecosystem Integration",
                 items: [
                   "2-3 protocol integrations",
@@ -600,7 +600,7 @@ const Whitepaper = () => {
                 ]
               },
               {
-                quarter: "Q2 2025",
+                quarter: "Q2 2026",
                 title: "Scale Operations",
                 items: [
                   "Increase bonds to 10k $HNCH",
@@ -610,7 +610,7 @@ const Whitepaper = () => {
                 ]
               },
               {
-                quarter: "Q3 2025+",
+                quarter: "Q3 2026+",
                 title: "Cross-Chain Expansion",
                 items: [
                   "Multi-chain oracle support",
