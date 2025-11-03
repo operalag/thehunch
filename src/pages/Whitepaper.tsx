@@ -257,67 +257,174 @@ const Whitepaper = () => {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 rounded bg-white/5">
-                    <span className="text-foreground">Total Supply</span>
-                    <span className="font-bold text-primary">50M $HNCH</span>
+                <div className="space-y-5">
+                  <div className="flex justify-between items-center p-4 rounded-lg bg-gradient-primary">
+                    <span className="text-foreground font-semibold">Total Supply</span>
+                    <span className="font-bold text-2xl text-foreground">100M $HNCH</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-foreground/80">Community</span>
-                      <span className="font-semibold text-foreground">35%</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--primary))' }} />
+                        <span className="text-foreground/90 font-medium">Community</span>
+                      </div>
+                      <span className="font-bold text-foreground text-lg">35%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div className="bg-primary h-2 rounded-full" style={{ width: '35%' }} />
+                    <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-500" style={{ 
+                        width: '35%', 
+                        backgroundColor: 'hsl(var(--primary))',
+                        boxShadow: '0 0 10px hsl(var(--primary) / 0.5)'
+                      }} />
                     </div>
+                    <div className="text-sm text-muted-foreground">35M $HNCH</div>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-foreground/80">Public Sale</span>
-                      <span className="font-semibold text-foreground">20%</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--accent))' }} />
+                        <span className="text-foreground/90 font-medium">Public Sale</span>
+                      </div>
+                      <span className="font-bold text-foreground text-lg">20%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div className="bg-accent h-2 rounded-full" style={{ width: '20%' }} />
+                    <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-500" style={{ 
+                        width: '20%', 
+                        backgroundColor: 'hsl(var(--accent))',
+                        boxShadow: '0 0 10px hsl(var(--accent) / 0.5)'
+                      }} />
                     </div>
+                    <div className="text-sm text-muted-foreground">20M $HNCH</div>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-foreground/80">Treasury</span>
-                      <span className="font-semibold text-foreground">18%</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--success-green))' }} />
+                        <span className="text-foreground/90 font-medium">Treasury</span>
+                      </div>
+                      <span className="font-bold text-foreground text-lg">18%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div className="bg-success-green h-2 rounded-full" style={{ width: '18%' }} />
+                    <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-500" style={{ 
+                        width: '18%', 
+                        backgroundColor: 'hsl(var(--success-green))',
+                        boxShadow: '0 0 10px hsl(var(--success-green) / 0.5)'
+                      }} />
                     </div>
+                    <div className="text-sm text-muted-foreground">18M $HNCH</div>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-foreground/80">Team (5yr vest)</span>
-                      <span className="font-semibold text-foreground">12%</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--oracle-purple))' }} />
+                        <span className="text-foreground/90 font-medium">Team (5yr vest)</span>
+                      </div>
+                      <span className="font-bold text-foreground text-lg">12%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div className="bg-oracle-purple h-2 rounded-full" style={{ width: '12%' }} />
+                    <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-500" style={{ 
+                        width: '12%', 
+                        backgroundColor: 'hsl(var(--oracle-purple))',
+                        boxShadow: '0 0 10px hsl(var(--oracle-purple) / 0.5)'
+                      }} />
                     </div>
+                    <div className="text-sm text-muted-foreground">12M $HNCH</div>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-foreground/80">Early Backers (4yr vest)</span>
-                      <span className="font-semibold text-foreground">10%</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(var(--soft-gray))' }} />
+                        <span className="text-foreground/90 font-medium">Early Backers (4yr vest)</span>
+                      </div>
+                      <span className="font-bold text-foreground text-lg">10%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div className="bg-soft-gray h-2 rounded-full" style={{ width: '10%' }} />
+                    <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-500" style={{ 
+                        width: '10%', 
+                        backgroundColor: 'hsl(var(--soft-gray))',
+                        boxShadow: '0 0 10px hsl(var(--soft-gray) / 0.5)'
+                      }} />
                     </div>
+                    <div className="text-sm text-muted-foreground">10M $HNCH</div>
                   </div>
                 </div>
                 <div className="flex items-center justify-center">
-                  <div className="relative w-64 h-64">
-                    {/* Simplified pie chart representation */}
-                    <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="20" strokeDasharray="87.96 251.2" />
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--accent))" strokeWidth="20" strokeDasharray="50.24 251.2" strokeDashoffset="-87.96" />
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--success-green))" strokeWidth="20" strokeDasharray="45.22 251.2" strokeDashoffset="-138.2" />
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--oracle-purple))" strokeWidth="20" strokeDasharray="30.14 251.2" strokeDashoffset="-183.42" />
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--soft-gray))" strokeWidth="20" strokeDasharray="25.12 251.2" strokeDashoffset="-213.56" />
+                  <div className="relative w-72 h-72">
+                    <svg viewBox="0 0 120 120" className="transform -rotate-90 w-full h-full">
+                      {/* Community 35% */}
+                      <circle 
+                        cx="60" 
+                        cy="60" 
+                        r="45" 
+                        fill="none" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth="28" 
+                        strokeDasharray="87.92 251.2"
+                        strokeDashoffset="0"
+                        className="drop-shadow-lg"
+                      />
+                      {/* Public Sale 20% */}
+                      <circle 
+                        cx="60" 
+                        cy="60" 
+                        r="45" 
+                        fill="none" 
+                        stroke="hsl(var(--accent))" 
+                        strokeWidth="28" 
+                        strokeDasharray="50.24 251.2"
+                        strokeDashoffset="-87.92"
+                        className="drop-shadow-lg"
+                      />
+                      {/* Treasury 18% */}
+                      <circle 
+                        cx="60" 
+                        cy="60" 
+                        r="45" 
+                        fill="none" 
+                        stroke="hsl(var(--success-green))" 
+                        strokeWidth="28" 
+                        strokeDasharray="45.216 251.2"
+                        strokeDashoffset="-138.16"
+                        className="drop-shadow-lg"
+                      />
+                      {/* Team 12% */}
+                      <circle 
+                        cx="60" 
+                        cy="60" 
+                        r="45" 
+                        fill="none" 
+                        stroke="hsl(var(--oracle-purple))" 
+                        strokeWidth="28" 
+                        strokeDasharray="30.144 251.2"
+                        strokeDashoffset="-183.376"
+                        className="drop-shadow-lg"
+                      />
+                      {/* Early Backers 10% */}
+                      <circle 
+                        cx="60" 
+                        cy="60" 
+                        r="45" 
+                        fill="none" 
+                        stroke="hsl(var(--soft-gray))" 
+                        strokeWidth="28" 
+                        strokeDasharray="25.12 251.2"
+                        strokeDashoffset="-213.52"
+                        className="drop-shadow-lg"
+                      />
+                      {/* Center circle for donut effect */}
+                      <circle 
+                        cx="60" 
+                        cy="60" 
+                        r="31" 
+                        fill="hsl(var(--deep-navy))"
+                      />
                     </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center transform rotate-90">
+                        <div className="text-3xl font-bold text-foreground">100M</div>
+                        <div className="text-sm text-muted-foreground">$HNCH</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
