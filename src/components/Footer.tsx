@@ -1,4 +1,4 @@
-import logo from '@/assets/hunch-logo.png';
+import logo from '@/assets/hunch-icon.png';
 
 const Footer = () => {
   return (
