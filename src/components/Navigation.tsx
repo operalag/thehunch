@@ -10,7 +10,6 @@ const Navigation = () => {
   const navLinks = [
     { name: 'About', href: '#about', type: 'scroll' },
     { name: 'Network', href: '#how-it-works', type: 'scroll' },
-    { name: 'Why TON', href: '#why-ton', type: 'scroll' },
     { name: 'Community', href: '#community', type: 'scroll' },
     { name: 'Membership', href: '/membership', type: 'link' },
     { name: 'Whitepaper', href: '/whitepaper', type: 'link' },

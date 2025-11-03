@@ -2,7 +2,6 @@ import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import AboutSection from '@/components/AboutSection';
 import HowItWorksSection from '@/components/HowItWorksSection';
-import WhyTONSection from '@/components/WhyTONSection';
 import UseCasesSection from '@/components/UseCasesSection';
 import StealthModeSection from '@/components/StealthModeSection';
 import CommunitySection from '@/components/CommunitySection';
@@ -15,7 +14,6 @@ const Index = () => {
       <Hero />
       <AboutSection />
       <HowItWorksSection />
-      <WhyTONSection />
       <UseCasesSection />
       <StealthModeSection />
       <CommunitySection />
