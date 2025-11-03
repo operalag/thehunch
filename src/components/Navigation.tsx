@@ -28,10 +28,8 @@ const Navigation = () => {
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
       <div className="container-custom">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <a href="#hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center">
-            <img src={logo} alt="HUNCH" className="h-10 md:h-12" />
-          </a>
+          {/* Logo removed */}
+          <div className="flex items-center" />
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

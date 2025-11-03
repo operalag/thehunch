@@ -11,7 +11,7 @@ const Footer = () => {
         }}
       />
       <div className="container-custom text-center relative z-10">
-        <img src={logo} alt="HUNCH" className="h-10 mx-auto mb-5" />
+        
         <p className="text-[hsl(var(--soft-gray))] text-sm">© 2025 HUNCH. All rights reserved.</p>
       </div>
     </footer>
