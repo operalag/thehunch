@@ -11,7 +11,17 @@ const Footer = () => {
         }}
       />
       <div className="container-custom text-center relative z-10">
-        
+        <p className="text-[hsl(var(--soft-gray))] text-sm mb-2">
+          theHUNCH is a TON infrastructure project led by the Swiss Web3 & Finance Operator{' '}
+          <a 
+            href="https://operal.solutions" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[hsl(var(--electric-cyan))] hover:underline transition-all"
+          >
+            Operal
+          </a>
+        </p>
         <p className="text-[hsl(var(--soft-gray))] text-sm">© 2025 HUNCH. All rights reserved.</p>
       </div>
     </footer>
