@@ -83,7 +83,7 @@ const Membership = () => {
                         <Calendar className="w-4 h-4 text-[hsl(var(--electric-cyan))]" />
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1">Snapshot: December 1st, 2025</h3>
+                        <h3 className="font-semibold mb-1">Snapshot: TGE date to be announced</h3>
                         <p className="text-sm text-[hsl(var(--soft-gray))]">
                           Make sure you own your NFT on this date to qualify
                         </p>
