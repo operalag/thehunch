@@ -687,17 +687,17 @@ const Whitepaper = () => {
           <div className="space-y-6">
             {[
               {
-                quarter: "Q4 2025",
+                phase: "Phase 1",
                 title: "Mainnet Launch",
                 items: [
-                  "December 1st mainnet deployment",
+                  "Mainnet deployment",
                   "Target 50+ proposals/day",
                   "Community onboarding programs",
                   "Initial prediction market partners"
                 ]
               },
               {
-                quarter: "Q1 2026",
+                phase: "Phase 2",
                 title: "Ecosystem Integration",
                 items: [
                   "2-3 protocol integrations",
@@ -707,7 +707,7 @@ const Whitepaper = () => {
                 ]
               },
               {
-                quarter: "Q2 2026",
+                phase: "Phase 3",
                 title: "Scale Operations",
                 items: [
                   "Increase bonds to 10k $HNCH",
@@ -717,7 +717,7 @@ const Whitepaper = () => {
                 ]
               },
               {
-                quarter: "Q3 2026+",
+                phase: "Phase 4",
                 title: "Cross-Chain Expansion",
                 items: [
                   "Multi-chain oracle support",
@@ -730,7 +730,7 @@ const Whitepaper = () => {
               <Card key={idx} className="glass-light border-white/10">
                 <CardHeader>
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-semibold px-3 py-1 rounded bg-primary/20 text-primary">{item.quarter}</span>
+                    <span className="text-sm font-semibold px-3 py-1 rounded bg-primary/20 text-primary">{item.phase}</span>
                     <CardTitle className="text-accent">{item.title}</CardTitle>
                   </div>
                 </CardHeader>
