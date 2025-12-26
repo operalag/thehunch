@@ -6,17 +6,17 @@ import { Wallet } from 'lucide-react';
 
 export const WalletConnect = () => {
   const wallet = useTonWallet();
-  const { connectWallet, disconnectWallet, user, isLoading } = useBlockchainStore();
+  const { connectWallet, disconnectWallet, setAddress, user, isLoading } = useBlockchainStore();
 
   // Sync real TON Connect state with our App Store
   useEffect(() => {
-    if (wallet && !user.address) {
-      connectWallet();
+    if (wallet?.account?.address) {
+      setAddress(wallet.account.address);
     } else if (!wallet && user.address && !user.address.startsWith('EQC...Demo')) {
       // Only disconnect if it wasn't a "Demo Mode" login
       disconnectWallet();
     }
-  }, [wallet, user.address, connectWallet, disconnectWallet]);
+  }, [wallet, user.address, setAddress, disconnectWallet]);
 
   return (
     <div className="flex items-center gap-4">

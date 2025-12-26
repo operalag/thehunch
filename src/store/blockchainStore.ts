@@ -32,6 +32,7 @@ interface BlockchainState {
   isLoading: boolean;
   
   // Actions
+  setAddress: (address: string | null) => void;
   connectWallet: () => void;
   disconnectWallet: () => void;
   faucet: () => void;
@@ -101,6 +102,12 @@ export const useBlockchainStore = create<BlockchainState>((set, get) => ({
   },
   events: INITIAL_EVENTS,
   isLoading: false,
+
+  setAddress: (address) => {
+    set((state) => ({
+      user: { ...state.user, address }
+    }));
+  },
 
   connectWallet: () => {
     set({ isLoading: true });
