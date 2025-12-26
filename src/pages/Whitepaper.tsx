@@ -282,6 +282,7 @@ const Whitepaper = () => {
               </div>
               <p className="text-foreground/80 text-sm text-center mt-6 italic">
                 Note: APY scales with oracle usage, not token inflation. This is real yield from protocol revenue.
+                Example assumes 30% (300M), 35% (350M), and 40% (400M) of 1B supply staked respectively.
               </p>
             </CardContent>
           </Card>
@@ -298,15 +299,15 @@ const Whitepaper = () => {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center p-4 rounded-lg bg-gradient-primary">
                     <span className="text-foreground font-semibold">Total Supply</span>
-                    <span className="font-bold text-2xl text-foreground">50M $HNCH</span>
+                    <span className="font-bold text-2xl text-foreground">1B $HNCH</span>
                   </div>
                   <div className="space-y-3">
                     {[
-                      { label: "Community", pct: "35%", val: "17.5M", color: "hsl(var(--primary))" },
-                      { label: "Public Sale (TGE)", pct: "25%", val: "12.5M", color: "hsl(var(--accent))" },
-                      { label: "Treasury", pct: "18%", val: "9M", color: "hsl(var(--success-green))" },
-                      { label: "Team (Vested)", pct: "12%", val: "6M", color: "hsl(var(--oracle-purple))" },
-                      { label: "Early Backers", pct: "10%", val: "5M", color: "hsl(var(--soft-gray))" }
+                      { label: "Community", pct: "35%", val: "350M", color: "hsl(var(--primary))" },
+                      { label: "Public Sale (TGE)", pct: "25%", val: "250M", color: "hsl(var(--accent))" },
+                      { label: "Treasury", pct: "18%", val: "180M", color: "hsl(var(--success-green))" },
+                      { label: "Team (Vested)", pct: "12%", val: "120M", color: "hsl(var(--oracle-purple))" },
+                      { label: "Early Backers", pct: "10%", val: "100M", color: "hsl(var(--soft-gray))" }
                     ].map((item, i) => (
                       <div key={i} className="space-y-1">
                         <div className="flex justify-between text-sm">
@@ -325,7 +326,7 @@ const Whitepaper = () => {
                   </div>
                 </div>
                 
-                {/* SVG Chart adapted for 50M */}
+                {/* SVG Chart adapted for 1B */}
                 <div className="flex items-center justify-center">
                   <div className="relative w-64 h-64">
                     <svg viewBox="0 0 120 120" className="transform -rotate-90 w-full h-full">
@@ -337,7 +338,7 @@ const Whitepaper = () => {
                       <circle cx="60" cy="60" r="45" fill="none" stroke="hsl(var(--soft-gray))" strokeWidth="20" strokeDasharray="25.1 251.2" strokeDashoffset="-226" />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <span className="text-3xl font-bold text-foreground">50M</span>
+                      <span className="text-3xl font-bold text-foreground">1B</span>
                       <span className="text-xs text-muted-foreground">Fixed Supply</span>
                     </div>
                   </div>
