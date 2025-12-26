@@ -14,12 +14,15 @@ const CreateMarket = () => {
   const { createEvent, user, isLoading } = useBlockchainStore();
   
   const [question, setQuestion] = useState('');
+  const [outcomeA, setOutcomeA] = useState('Yes');
+  const [outcomeB, setOutcomeB] = useState('No');
+  const [source, setSource] = useState('');
   const [category, setCategory] = useState<string>('');
   const [bond, setBond] = useState('10000');
 
   const handleCreate = () => {
-    if (!question || !category || !bond) return;
-    createEvent(question, Number(bond), category as any);
+    if (!question || !outcomeA || !outcomeB || !source || !category || !bond) return;
+    createEvent(question, Number(bond), category as any, [outcomeA, outcomeB], source);
     navigate('/app');
   };
 
@@ -70,6 +73,36 @@ const CreateMarket = () => {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
+                <Label>Outcome A</Label>
+                <Input 
+                  value={outcomeA}
+                  onChange={(e) => setOutcomeA(e.target.value)}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Outcome B</Label>
+                <Input 
+                  value={outcomeB}
+                  onChange={(e) => setOutcomeB(e.target.value)}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Resolution Source</Label>
+              <Input 
+                placeholder="e.g. Binance API, SportsAPI, NYTimes" 
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                className="bg-white/5 border-white/10"
+              />
+              <p className="text-xs text-muted-foreground">Provide a reliable source for the result.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
                 <Label>Category</Label>
                 <Select onValueChange={setCategory}>
                   <SelectTrigger className="bg-white/5 border-white/10">
@@ -111,7 +144,7 @@ const CreateMarket = () => {
               className="w-full gradient-primary" 
               size="lg"
               onClick={handleCreate}
-              disabled={isLoading || !question || !category || user.hnchBalance < Number(bond)}
+              disabled={isLoading || !question || !outcomeA || !outcomeB || !source || !category || user.hnchBalance < Number(bond)}
             >
               {isLoading ? 'Creating...' : (
                 <>
