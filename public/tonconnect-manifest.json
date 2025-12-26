@@ -1,7 +1,7 @@
 {
-  "url": "https://operalag.github.io/hunch-demo-frontend/",
+  "url": "https://hunch-demo-frontend.vercel.app/",
   "name": "Hunch Oracle DApp",
-  "iconUrl": "https://operalag.github.io/hunch-demo-frontend/favicon.png",
-  "termsOfUseUrl": "https://operalag.github.io/hunch-demo-frontend/terms.html",
-  "privacyPolicyUrl": "https://operalag.github.io/hunch-demo-frontend/privacy.html"
+  "iconUrl": "https://hunch-demo-frontend.vercel.app/favicon.png",
+  "termsOfUseUrl": "https://hunch-demo-frontend.vercel.app/terms.html",
+  "privacyPolicyUrl": "https://hunch-demo-frontend.vercel.app/privacy.html"
 }
