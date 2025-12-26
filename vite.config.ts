@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/hunch-demo-frontend/",
+  base: mode === "development" ? "/" : "/hunch-demo-frontend/",
   server: {
     host: "::",
     port: 8080,
