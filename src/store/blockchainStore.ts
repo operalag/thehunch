@@ -10,6 +10,7 @@ export interface OracleEvent {
   bond: number;
   outcomes?: [string, string];
   source?: string;
+  resolutionTime?: number;
   createdAt: number;
   status: EventStatus;
   outcome?: string; // The reported outcome
@@ -43,7 +44,7 @@ interface BlockchainState {
   delegate: (address: string) => void;
   claimRewards: () => void;
   
-  createEvent: (question: string, bond: number, category: OracleEvent['category'], outcomes: [string, string], source: string) => void;
+  createEvent: (question: string, bond: number, category: OracleEvent['category'], outcomes: [string, string], source: string, resolutionTime: number) => void;
   reportOutcome: (eventId: string, outcome: string) => void;
   challengeOutcome: (eventId: string) => void;
   vote: (eventId: string, support: boolean, amount: number) => void;
@@ -199,7 +200,7 @@ export const useBlockchainStore = create<BlockchainState>((set, get) => ({
     }, 1000);
   },
 
-  createEvent: (question, bond, category, outcomes, source) => {
+  createEvent: (question, bond, category, outcomes, source, resolutionTime) => {
     const { user } = get();
     if (user.hnchBalance < bond) return;
     
@@ -212,6 +213,7 @@ export const useBlockchainStore = create<BlockchainState>((set, get) => ({
         bond,
         outcomes,
         source,
+        resolutionTime,
         createdAt: Date.now(),
         status: 'Active',
         challengeCount: 0,

@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, PlusCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ArrowLeft, PlusCircle, Info } from 'lucide-react';
 
 const CreateMarket = () => {
   const navigate = useNavigate();
@@ -17,12 +18,14 @@ const CreateMarket = () => {
   const [outcomeA, setOutcomeA] = useState('Yes');
   const [outcomeB, setOutcomeB] = useState('No');
   const [source, setSource] = useState('');
+  const [resolutionTime, setResolutionTime] = useState('');
   const [category, setCategory] = useState<string>('');
   const [bond, setBond] = useState('10000');
 
   const handleCreate = () => {
-    if (!question || !outcomeA || !outcomeB || !source || !category || !bond) return;
-    createEvent(question, Number(bond), category as any, [outcomeA, outcomeB], source);
+    if (!question || !outcomeA || !outcomeB || !source || !resolutionTime || !category || !bond) return;
+    const resolutionTimestamp = new Date(resolutionTime).getTime();
+    createEvent(question, Number(bond), category as any, [outcomeA, outcomeB], source, resolutionTimestamp);
     navigate('/app');
   };
 
@@ -101,6 +104,26 @@ const CreateMarket = () => {
               <p className="text-xs text-muted-foreground">Provide a reliable source for the result.</p>
             </div>
 
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label>Resolution Time</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">Make sure the result can be typed in only 10 min after the event officially finishes.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Input 
+                type="datetime-local"
+                value={resolutionTime}
+                onChange={(e) => setResolutionTime(e.target.value)}
+                className="bg-white/5 border-white/10"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label>Category</Label>
@@ -144,7 +167,7 @@ const CreateMarket = () => {
               className="w-full gradient-primary" 
               size="lg"
               onClick={handleCreate}
-              disabled={isLoading || !question || !outcomeA || !outcomeB || !source || !category || user.hnchBalance < Number(bond)}
+              disabled={isLoading || !question || !outcomeA || !outcomeB || !source || !resolutionTime || !category || user.hnchBalance < Number(bond)}
             >
               {isLoading ? 'Creating...' : (
                 <>
