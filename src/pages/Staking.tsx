@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Navigation from '@/components/Navigation';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,21 +26,26 @@ const Staking = () => {
 
   if (!user.address) {
     return (
-      <div className="min-h-screen pt-28 pb-12 flex flex-col items-center justify-center text-center px-4">
-        <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-6">
-          <Wallet className="w-10 h-10 text-primary" />
+      <>
+        <Navigation />
+        <div className="min-h-screen pt-28 pb-12 flex flex-col items-center justify-center text-center px-4">
+          <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-6">
+            <Wallet className="w-10 h-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold mb-4">Connect Wallet to Earn Yield</h1>
+          <p className="text-muted-foreground max-w-md mb-8">
+            Connect your TON wallet to stake HNCH, earn 60% protocol revenue, and participate in governance.
+          </p>
         </div>
-        <h1 className="text-3xl font-bold mb-4">Connect Wallet to Earn Yield</h1>
-        <p className="text-muted-foreground max-w-md mb-8">
-          Connect your TON wallet to stake HNCH, earn 60% protocol revenue, and participate in governance.
-        </p>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
-      <div className="container-custom max-w-6xl">
+    <>
+      <Navigation />
+      <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
+        <div className="container-custom max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-bold text-gradient">Staking & Governance</h1>
@@ -229,9 +235,9 @@ const Staking = () => {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
+              </div>
+            </div>
+          </>
+        );
+      };
 export default Staking;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,8 +25,10 @@ const MarketDetails = () => {
   const isDaoVote = event.status === 'DAO_Vote';
 
   return (
-    <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
-      <div className="container-custom max-w-4xl">
+    <>
+      <Navigation />
+      <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
+        <div className="container-custom max-w-4xl">
         <Button variant="ghost" onClick={() => navigate('/app')} className="mb-6 pl-0">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </Button>
@@ -157,9 +160,9 @@ const MarketDetails = () => {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
+              </div>
+            </div>
+          </>
+        );
+      };
 export default MarketDetails;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
 import { useBlockchainStore, OracleEvent, EventStatus } from '@/store/blockchainStore';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -87,8 +88,10 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
-      <div className="container-custom max-w-7xl">
+    <>
+      <Navigation />
+      <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
+        <div className="container-custom max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-bold text-gradient">Market Dashboard</h1>
@@ -141,6 +144,7 @@ const Dashboard = () => {
         </Tabs>
       </div>
     </div>
+    </>
   );
 };
 

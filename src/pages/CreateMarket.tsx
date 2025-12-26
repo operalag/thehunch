@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,16 +25,21 @@ const CreateMarket = () => {
 
   if (!user.address) {
     return (
-      <div className="min-h-screen pt-28 flex flex-col items-center justify-center text-center">
-        <h1 className="text-2xl font-bold mb-4">Connect Wallet to Create Markets</h1>
-        <Button onClick={() => navigate('/app')}>Back to Dashboard</Button>
-      </div>
+      <>
+        <Navigation />
+        <div className="min-h-screen pt-28 flex flex-col items-center justify-center text-center">
+          <h1 className="text-2xl font-bold mb-4">Connect Wallet to Create Markets</h1>
+          <Button onClick={() => navigate('/app')}>Back to Dashboard</Button>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
-      <div className="container-custom max-w-2xl">
+    <>
+      <Navigation />
+      <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
+        <div className="container-custom max-w-2xl">
         <Button 
           variant="ghost" 
           onClick={() => navigate('/app')} 
@@ -118,6 +124,7 @@ const CreateMarket = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 
