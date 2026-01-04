@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // Types representing our blockchain state
 export type EventStatus = 'Active' | 'Reported' | 'Disputed' | 'Finalized' | 'DAO_Vote';
@@ -33,7 +34,7 @@ interface BlockchainState {
   user: UserState;
   events: OracleEvent[];
   isLoading: boolean;
-  
+
   // Actions
   setAddress: (address: string | null) => void;
   connectWallet: () => void;
@@ -43,7 +44,7 @@ interface BlockchainState {
   unstake: (amount: number) => void;
   delegate: (address: string) => void;
   claimRewards: () => void;
-  
+
   createEvent: (question: string, bond: number, category: OracleEvent['category'], outcomes: [string, string], source: string, resolutionTime: number) => void;
   reportOutcome: (eventId: string, outcome: string) => void;
   challengeOutcome: (eventId: string) => void;
@@ -95,194 +96,201 @@ const INITIAL_EVENTS: OracleEvent[] = [
   }
 ];
 
-export const useBlockchainStore = create<BlockchainState>((set, get) => ({
-  user: {
-    address: null,
-    hnchBalance: 0,
-    stakedBalance: 0,
-    delegatedTo: null,
-    pendingRewards: 0,
-  },
-  events: INITIAL_EVENTS,
-  isLoading: false,
+export const useBlockchainStore = create<BlockchainState>()(
+  persist(
+    (set, get) => ({
+      user: {
+        address: null,
+        hnchBalance: 0,
+        stakedBalance: 0,
+        delegatedTo: null,
+        pendingRewards: 0,
+      },
+      events: INITIAL_EVENTS,
+      isLoading: false,
 
-  setAddress: (address) => {
-    set((state) => ({
-      user: { ...state.user, address }
-    }));
-  },
+      setAddress: (address) => {
+        set((state) => ({
+          user: { ...state.user, address }
+        }));
+      },
 
-  connectWallet: () => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        user: { ...state.user, address: 'EQC...DemoUser', hnchBalance: 1000 } // Start with a little balance or 0
-      }));
-    }, 800);
-  },
+      connectWallet: () => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            user: { ...state.user, address: 'EQC...DemoUser', hnchBalance: 1000 } // Start with a little balance or 0
+          }));
+        }, 800);
+      },
 
-  disconnectWallet: () => {
-    set({ 
-      user: { 
-        address: null, 
-        hnchBalance: 0, 
-        stakedBalance: 0, 
-        delegatedTo: null, 
-        pendingRewards: 0 
-      } 
-    });
-  },
+      disconnectWallet: () => {
+        set({ 
+          user: { 
+            address: null, 
+            hnchBalance: 0, 
+            stakedBalance: 0, 
+            delegatedTo: null, 
+            pendingRewards: 0 
+          } 
+        });
+      },
 
-  faucet: () => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        user: { ...state.user, hnchBalance: state.user.hnchBalance + 50000 }
-      }));
-    }, 1000);
-  },
+      faucet: () => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            user: { ...state.user, hnchBalance: state.user.hnchBalance + 50000 }
+          }));
+        }, 1000);
+      },
 
-  stake: (amount) => {
-    const { user } = get();
-    if (user.hnchBalance < amount) return;
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        user: {
-          ...state.user,
-          hnchBalance: state.user.hnchBalance - amount,
-          stakedBalance: state.user.stakedBalance + amount
-        }
-      }));
-    }, 1500);
-  },
+      stake: (amount) => {
+        const { user } = get();
+        if (user.hnchBalance < amount) return;
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            user: {
+              ...state.user,
+              hnchBalance: state.user.hnchBalance - amount,
+              stakedBalance: state.user.stakedBalance + amount
+            }
+          }));
+        }, 1500);
+      },
 
-  unstake: (amount) => {
-    const { user } = get();
-    if (user.stakedBalance < amount) return;
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        user: {
-          ...state.user,
-          stakedBalance: state.user.stakedBalance - amount,
-          hnchBalance: state.user.hnchBalance + amount
-        }
-      }));
-    }, 1500);
-  },
+      unstake: (amount) => {
+        const { user } = get();
+        if (user.stakedBalance < amount) return;
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            user: {
+              ...state.user,
+              stakedBalance: state.user.stakedBalance - amount,
+              hnchBalance: state.user.hnchBalance + amount
+            }
+          }));
+        }, 1500);
+      },
 
-  delegate: (address) => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        user: { ...state.user, delegatedTo: address }
-      }));
-    }, 1000);
-  },
+      delegate: (address) => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            user: { ...state.user, delegatedTo: address }
+          }));
+        }, 1000);
+      },
 
-  claimRewards: () => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        user: { 
-          ...state.user, 
-          hnchBalance: state.user.hnchBalance + state.user.pendingRewards,
-          pendingRewards: 0 
-        }
-      }));
-    }, 1000);
-  },
+      claimRewards: () => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            user: { 
+              ...state.user, 
+              hnchBalance: state.user.hnchBalance + state.user.pendingRewards,
+              pendingRewards: 0 
+            }
+          }));
+        }, 1000);
+      },
 
-  createEvent: (question, bond, category, outcomes, source, resolutionTime) => {
-    const { user } = get();
-    if (user.hnchBalance < bond) return;
-    
-    set({ isLoading: true });
-    setTimeout(() => {
-      const newEvent: OracleEvent = {
-        id: Math.random().toString(36).substr(2, 9),
-        question,
-        category,
-        bond,
-        outcomes,
-        source,
-        resolutionTime,
-        createdAt: Date.now(),
-        status: 'Active',
-        challengeCount: 0,
-        totalStaked: 0,
-        votesFor: 0,
-        votesAgainst: 0,
-        creator: user.address || 'EQC...Anon'
-      };
-      
-      set((state) => ({
-        isLoading: false,
-        user: { ...state.user, hnchBalance: state.user.hnchBalance - bond },
-        events: [newEvent, ...state.events]
-      }));
-    }, 2000);
-  },
-
-  reportOutcome: (eventId, outcome) => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        events: state.events.map(e => 
-          e.id === eventId 
-            ? { ...e, status: 'Reported', outcome } 
-            : e
-        )
-      }));
-    }, 1500);
-  },
-
-  challengeOutcome: (eventId) => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        events: state.events.map(e => {
-          if (e.id !== eventId) return e;
-          
-          // Logic: 2x bond escalation. If count >= 2 (becoming 3), move to DAO Vote
-          const newCount = e.challengeCount + 1;
-          const newStatus = newCount >= 3 ? 'DAO_Vote' : 'Disputed';
-          
-          return {
-            ...e,
-            challengeCount: newCount,
-            status: newStatus,
-            bond: e.bond * 2
+      createEvent: (question, bond, category, outcomes, source, resolutionTime) => {
+        const { user } = get();
+        if (user.hnchBalance < bond) return;
+        
+        set({ isLoading: true });
+        setTimeout(() => {
+          const newEvent: OracleEvent = {
+            id: Math.random().toString(36).substr(2, 9),
+            question,
+            category,
+            bond,
+            outcomes,
+            source,
+            resolutionTime,
+            createdAt: Date.now(),
+            status: 'Active',
+            challengeCount: 0,
+            totalStaked: 0,
+            votesFor: 0,
+            votesAgainst: 0,
+            creator: user.address || 'EQC...Anon'
           };
-        })
-      }));
-    }, 1500);
-  },
+          
+          set((state) => ({
+            isLoading: false,
+            user: { ...state.user, hnchBalance: state.user.hnchBalance - bond },
+            events: [newEvent, ...state.events]
+          }));
+        }, 2000);
+      },
 
-  vote: (eventId, support, amount) => {
-    set({ isLoading: true });
-    setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        events: state.events.map(e => {
-          if (e.id !== eventId) return e;
-          return {
-            ...e,
-            votesFor: support ? e.votesFor + Math.sqrt(amount) : e.votesFor, // Quadratic!
-            votesAgainst: !support ? e.votesAgainst + Math.sqrt(amount) : e.votesAgainst,
-            totalStaked: e.totalStaked + amount
-          };
-        })
-      }));
-    }, 1500);
-  }
-}));
+      reportOutcome: (eventId, outcome) => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            events: state.events.map(e => 
+              e.id === eventId 
+                ? { ...e, status: 'Reported', outcome } 
+                : e
+            )
+          }));
+        }, 1500);
+      },
+
+      challengeOutcome: (eventId) => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            events: state.events.map(e => {
+              if (e.id !== eventId) return e;
+              
+              // Logic: 2x bond escalation. If count >= 2 (becoming 3), move to DAO Vote
+              const newCount = e.challengeCount + 1;
+              const newStatus = newCount >= 3 ? 'DAO_Vote' : 'Disputed';
+              
+              return {
+                ...e,
+                challengeCount: newCount,
+                status: newStatus,
+                bond: e.bond * 2
+              };
+            })
+          }));
+        }, 1500);
+      },
+
+      vote: (eventId, support, amount) => {
+        set({ isLoading: true });
+        setTimeout(() => {
+          set((state) => ({
+            isLoading: false,
+            events: state.events.map(e => {
+              if (e.id !== eventId) return e;
+              return {
+                ...e,
+                votesFor: support ? e.votesFor + Math.sqrt(amount) : e.votesFor, // Quadratic!
+                votesAgainst: !support ? e.votesAgainst + Math.sqrt(amount) : e.votesAgainst,
+                totalStaked: e.totalStaked + amount
+              };
+            })
+          }));
+        }, 1500);
+      }
+    }),
+    {
+      name: 'hunch-storage',
+    }
+  )
+);

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import StatusBadge from '@/components/StatusBadge';
 import { ArrowLeft, AlertTriangle, Gavel, Check, X } from 'lucide-react';
 
 const MarketDetails = () => {
@@ -38,8 +39,11 @@ const MarketDetails = () => {
           <div className="lg:col-span-2 space-y-6">
             <Card className="glass border-white/10">
               <CardHeader>
-                <div className="flex justify-between mb-2">
-                  <Badge variant="secondary">{event.category}</Badge>
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex gap-2 items-center">
+                    <Badge variant="secondary">{event.category}</Badge>
+                    <StatusBadge status={event.status} />
+                  </div>
                   <span className="text-sm font-mono text-muted-foreground">ID: {event.id}</span>
                 </div>
                 <CardTitle className="text-2xl leading-tight">{event.question}</CardTitle>
