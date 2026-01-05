@@ -34,6 +34,7 @@ export interface UserState {
 interface BlockchainState {
   user: UserState;
   events: OracleEvent[];
+  protocolRevenue: number;
   isLoading: boolean;
 
   // Actions
@@ -111,6 +112,7 @@ export const useBlockchainStore = create<BlockchainState>()(
         pendingRewards: 0,
       },
       events: INITIAL_EVENTS,
+      protocolRevenue: 1250000, // Mock initial revenue
       isLoading: false,
 
       setAddress: (address) => {
@@ -230,12 +232,12 @@ export const useBlockchainStore = create<BlockchainState>()(
             creator: user.address || 'EQC...Anon'
           };
           
-          set((state) => ({
-            isLoading: false,
-            user: { ...state.user, hnchBalance: state.user.hnchBalance - bond },
-            events: [newEvent, ...state.events]
-          }));
-        }, 2000);
+                set((state) => ({
+                  isLoading: false,
+                  user: { ...state.user, hnchBalance: state.user.hnchBalance - bond },
+                  protocolRevenue: state.protocolRevenue + 500, // 500 HNCH creation fee
+                  events: [newEvent, ...state.events]
+                }));        }, 2000);
       },
 
       reportOutcome: (eventId, outcome) => {
@@ -277,17 +279,22 @@ export const useBlockchainStore = create<BlockchainState>()(
       finalizeEvent: (eventId) => {
     set({ isLoading: true });
     setTimeout(() => {
-      set((state) => ({
-        isLoading: false,
-        events: state.events.map(e => {
-          if (e.id !== eventId) return e;
-          return {
-            ...e,
-            status: 'Finalized',
-            statusUpdatedAt: Date.now()
-          };
-        })
-      }));
+      set((state) => {
+        const reward = 1500; // Mock reward for finalizing
+        return {
+          isLoading: false,
+          protocolRevenue: state.protocolRevenue - reward,
+          user: { ...state.user, pendingRewards: state.user.pendingRewards + reward },
+          events: state.events.map(e => {
+            if (e.id !== eventId) return e;
+            return {
+              ...e,
+              status: 'Finalized',
+              statusUpdatedAt: Date.now()
+            };
+          })
+        };
+      });
     }, 1500);
   },
 

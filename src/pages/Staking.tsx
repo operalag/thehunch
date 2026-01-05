@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Coins, Trophy, Users, Vote, ArrowRight, Wallet } from 'lucide-react';
 
 const Staking = () => {
-  const { user, stake, unstake, claimRewards, delegate, faucet, isLoading } = useBlockchainStore();
+  const { user, protocolRevenue, stake, unstake, claimRewards, delegate, faucet, isLoading } = useBlockchainStore();
   const [stakeAmount, setStakeAmount] = useState('');
   const [delegateAddress, setDelegateAddress] = useState('');
 
@@ -82,11 +82,11 @@ const Staking = () => {
           </Card>
           <Card className="glass-light border-white/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Current APY</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Protocol Revenue</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-accent">164.3%</div>
-              <p className="text-xs text-muted-foreground mt-1">Based on last 7 days</p>
+              <div className="text-2xl font-bold text-accent">{protocolRevenue.toLocaleString()} HNCH</div>
+              <p className="text-xs text-muted-foreground mt-1">Available for distribution</p>
             </CardContent>
           </Card>
           <Card className="glass-light border-white/10">
