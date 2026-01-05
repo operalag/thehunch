@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import StatusBadge from '@/components/StatusBadge';
+import CountdownTimer from '@/components/CountdownTimer';
 import { ArrowLeft, AlertTriangle, Gavel, Check, X } from 'lucide-react';
 
 const MarketDetails = () => {
@@ -16,6 +17,8 @@ const MarketDetails = () => {
   const navigate = useNavigate();
   const { events, user, reportOutcome, challengeOutcome, vote, isLoading } = useBlockchainStore();
   
+  const CHALLENGE_WINDOW = 2 * 60 * 60 * 1000; // 2 hours
+
   const event = events.find(e => e.id === id);
   const [outcomeInput, setOutcomeInput] = useState('');
   const [voteAmount, setVoteAmount] = useState('');
@@ -116,7 +119,15 @@ const MarketDetails = () => {
           <div className="space-y-6">
             <Card className="glass-light border-white/10">
               <CardHeader>
-                <CardTitle>Actions</CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Actions</CardTitle>
+                  {(event.status === 'Reported' || event.status === 'Disputed' || event.status === 'DAO_Vote') && event.statusUpdatedAt && (
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground mb-1">Challenge Window Ends</p>
+                      <CountdownTimer targetDate={event.statusUpdatedAt + CHALLENGE_WINDOW} />
+                    </div>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 {event.status === 'Active' && (

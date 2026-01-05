@@ -13,6 +13,7 @@ export interface OracleEvent {
   source?: string;
   resolutionTime?: number;
   createdAt: number;
+  statusUpdatedAt?: number;
   status: EventStatus;
   outcome?: string; // The reported outcome
   challengeCount: number;
@@ -72,6 +73,7 @@ const INITIAL_EVENTS: OracleEvent[] = [
     category: 'Tech',
     bond: 20000,
     createdAt: Date.now() - 5000000,
+    statusUpdatedAt: Date.now() - 1000000, // 1000s ago
     status: 'Reported',
     outcome: 'Yes',
     challengeCount: 0,
@@ -86,6 +88,7 @@ const INITIAL_EVENTS: OracleEvent[] = [
     category: 'Sports',
     bond: 80000,
     createdAt: Date.now() - 2000000,
+    statusUpdatedAt: Date.now() - 500000,
     status: 'DAO_Vote', // Escalated!
     outcome: 'Team Notcoin',
     challengeCount: 3,
@@ -239,13 +242,12 @@ export const useBlockchainStore = create<BlockchainState>()(
         setTimeout(() => {
           set((state) => ({
             isLoading: false,
-            events: state.events.map(e => 
-              e.id === eventId 
-                ? { ...e, status: 'Reported', outcome } 
-                : e
-            )
-          }));
-        }, 1500);
+                    events: state.events.map(e => 
+                      e.id === eventId 
+                        ? { ...e, status: 'Reported', outcome, statusUpdatedAt: Date.now() } 
+                        : e
+                    )
+                  }));        }, 1500);
       },
 
       challengeOutcome: (eventId) => {
@@ -260,13 +262,13 @@ export const useBlockchainStore = create<BlockchainState>()(
               const newCount = e.challengeCount + 1;
               const newStatus = newCount >= 3 ? 'DAO_Vote' : 'Disputed';
               
-              return {
-                ...e,
-                challengeCount: newCount,
-                status: newStatus,
-                bond: e.bond * 2
-              };
-            })
+                        return {
+                          ...e,
+                          challengeCount: newCount,
+                          status: newStatus,
+                          statusUpdatedAt: Date.now(),
+                          bond: e.bond * 2
+                        };            })
           }));
         }, 1500);
       },
