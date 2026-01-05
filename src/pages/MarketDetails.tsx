@@ -15,7 +15,7 @@ import { ArrowLeft, AlertTriangle, Gavel, Check, X } from 'lucide-react';
 const MarketDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { events, user, reportOutcome, challengeOutcome, vote, isLoading } = useBlockchainStore();
+  const { events, user, reportOutcome, challengeOutcome, finalizeEvent, vote, isLoading } = useBlockchainStore();
   
   const CHALLENGE_WINDOW = 2 * 60 * 60 * 1000; // 2 hours
 
@@ -161,6 +161,20 @@ const MarketDetails = () => {
                       disabled={isLoading || user.hnchBalance < event.bond * 2}
                     >
                       Challenge Outcome
+                    </Button>
+                  </div>
+                )}
+
+                {event.status === 'DAO_Vote' && (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Voting in progress. Finalize when complete.</p>
+                    <Button 
+                      className="w-full"
+                      variant="default"
+                      onClick={() => finalizeEvent(event.id)}
+                      disabled={isLoading}
+                    >
+                      Finalize Vote
                     </Button>
                   </div>
                 )}

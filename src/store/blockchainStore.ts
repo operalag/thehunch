@@ -49,6 +49,7 @@ interface BlockchainState {
   createEvent: (question: string, bond: number, category: OracleEvent['category'], outcomes: [string, string], source: string, resolutionTime: number) => void;
   reportOutcome: (eventId: string, outcome: string) => void;
   challengeOutcome: (eventId: string) => void;
+  finalizeEvent: (eventId: string) => void;
   vote: (eventId: string, support: boolean, amount: number) => void;
 }
 
@@ -273,7 +274,24 @@ export const useBlockchainStore = create<BlockchainState>()(
         }, 1500);
       },
 
-      vote: (eventId, support, amount) => {
+      finalizeEvent: (eventId) => {
+    set({ isLoading: true });
+    setTimeout(() => {
+      set((state) => ({
+        isLoading: false,
+        events: state.events.map(e => {
+          if (e.id !== eventId) return e;
+          return {
+            ...e,
+            status: 'Finalized',
+            statusUpdatedAt: Date.now()
+          };
+        })
+      }));
+    }, 1500);
+  },
+
+  vote: (eventId, support, amount) => {
         set({ isLoading: true });
         setTimeout(() => {
           set((state) => ({
