@@ -35,6 +35,7 @@ interface BlockchainState {
   user: UserState;
   events: OracleEvent[];
   protocolRevenue: number;
+  totalStakedGlobal: number;
   isLoading: boolean;
 
   // Actions
@@ -113,6 +114,7 @@ export const useBlockchainStore = create<BlockchainState>()(
       },
       events: INITIAL_EVENTS,
       protocolRevenue: 1250000, // Mock initial revenue
+      totalStakedGlobal: 5000000, // Mock initial global staked
       isLoading: false,
 
       setAddress: (address) => {
@@ -160,6 +162,7 @@ export const useBlockchainStore = create<BlockchainState>()(
         setTimeout(() => {
           set((state) => ({
             isLoading: false,
+            totalStakedGlobal: state.totalStakedGlobal + amount,
             user: {
               ...state.user,
               hnchBalance: state.user.hnchBalance - amount,
@@ -176,6 +179,7 @@ export const useBlockchainStore = create<BlockchainState>()(
         setTimeout(() => {
           set((state) => ({
             isLoading: false,
+            totalStakedGlobal: state.totalStakedGlobal - amount,
             user: {
               ...state.user,
               stakedBalance: state.user.stakedBalance - amount,

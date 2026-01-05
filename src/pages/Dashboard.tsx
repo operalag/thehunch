@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus } from 'lucide-react';
+import { Plus, RefreshCcw } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
+import TokenFlow from '@/components/TokenFlow';
 
 const EventCard = ({ event }: { event: OracleEvent }) => (
   <Card className="glass-light border-white/10 hover:border-primary/30 transition-all hover:-translate-y-1">
@@ -55,6 +56,12 @@ const EventCard = ({ event }: { event: OracleEvent }) => (
 const Dashboard = () => {
   const { events } = useBlockchainStore();
   const [filter, setFilter] = useState('all');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 1000);
+  };
 
   const filteredEvents = events.filter(e => {
     if (filter === 'all') return true;
@@ -69,10 +76,24 @@ const Dashboard = () => {
       <Navigation />
       <div className="min-h-screen pt-28 pb-12 bg-[hsl(var(--deep-navy))]">
         <div className="container-custom max-w-7xl">
+        
+        {/* Token Economy Visualization */}
+        <TokenFlow />
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-4xl font-bold text-gradient">Market Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Browse, report on, and dispute prediction markets.</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gradient">Market Dashboard</h1>
+              <p className="text-muted-foreground mt-2">Browse, report on, and dispute prediction markets.</p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={handleRefresh}
+              className={`rounded-full border-white/10 hover:bg-white/5 ${isRefreshing ? 'animate-spin' : ''}`}
+            >
+              <RefreshCcw className="w-4 h-4" />
+            </Button>
           </div>
           <Link to="/app/create">
             <Button className="gradient-primary text-white shadow-lg shadow-primary/20">
