@@ -31,7 +31,7 @@ export const TESTNET_CONFIG: NetworkConfig = {
     MASTER_ORACLE: 'kQBO-cZMdJU0lxlH1bBF8Mn7AjF5SQenaqRkq0_a5JPcqLbf',
     FEE_DISTRIBUTOR: 'kQAeRl5W6SpCoQwjXzFz-iYDNI8Td8XC4O0K3rmYNvoM9LVF',
   },
-  manifestUrl: 'https://thehunch.business/tonconnect-manifest.json',
+  manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
 
 // Mainnet Configuration - V6.2 deployed 2026-01-26 (CRITICAL: fixed stake_snapshots dict loading)
@@ -46,7 +46,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
     MASTER_ORACLE: 'EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J',
     FEE_DISTRIBUTOR: 'EQAv8Slzak1IAK_iBWNDNO6DR2q7G4idV3ThM9kMYOnB1oXt',
   },
-  manifestUrl: 'https://thehunch.business/tonconnect-manifest.json',
+  manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
 
 // Storage key for network preference
