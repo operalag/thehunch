@@ -1,8 +1,21 @@
-# HUNCH Oracle Frontend - Release Candidate v2.3.2
+# HUNCH Oracle Frontend - Release Candidate 260126-A
 
 **Status:** RELEASE CANDIDATE
+**Version:** RC-260126-A
 **Date:** January 26, 2026
 **Deployment:** https://hunch-oracle-app.vercel.app
+
+---
+
+## Verification Status
+
+| Feature | Status | Verified |
+|---------|--------|----------|
+| V6.3 Markets Display (Mainnet) | Working | Jan 26, 2026 |
+| V6.3 Markets Display (Testnet) | Working | Jan 26, 2026 |
+| Network Switcher | Working | Jan 26, 2026 |
+| Staking Flow (Mainnet) | **VERIFIED** | Jan 26, 2026 |
+| Wallet Connection | Working | Jan 26, 2026 |
 
 ---
 
@@ -125,13 +138,16 @@ b58e2a67 - fix: Filter to show only V6.3+ markets
 - [x] Testnet shows exactly 4 V6.3 markets
 - [x] Network switcher toggles between mainnet/testnet
 - [x] Markets load from Supabase cache instantly
-- [x] Version badge shows v2.3.2
+- [x] Version badge shows RC-260126-A
 - [x] Wallet connection via TonConnect
+- [x] **Staking flow on Mainnet** - VERIFIED Jan 26, 2026
 
 ### Needs Testing
 - [ ] Market detail page displays correctly
 - [ ] Trading flow (buy YES/NO)
 - [ ] Proposal/challenge flow
+- [ ] Unstaking flow
+- [ ] Claim rewards flow
 - [ ] Mobile responsiveness
 
 ---
