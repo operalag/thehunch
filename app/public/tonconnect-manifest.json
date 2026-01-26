@@ -1,7 +1,7 @@
 {
-  "url": "https://app.thehunch.app",
+  "url": "https://hunch-oracle-app.vercel.app",
   "name": "HUNCH Oracle",
-  "iconUrl": "https://app.thehunch.app/logo.svg",
+  "iconUrl": "https://hunch-oracle-app.vercel.app/logo.svg",
   "termsOfUseUrl": "https://thehunch.app/terms",
   "privacyPolicyUrl": "https://thehunch.app/privacy"
 }
