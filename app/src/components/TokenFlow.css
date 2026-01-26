@@ -1,0 +1,397 @@
+.token-flow-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.expand-icon {
+  font-size: 1.5rem;
+  color: #888;
+  transition: transform 0.3s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.token-flow-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 1rem;
+}
+
+/* Epoch Info Card */
+.epoch-info-card {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.epoch-info-card h3 {
+  margin: 0 0 16px 0;
+  color: #a5b4fc;
+  font-size: 1.1rem;
+}
+
+.epoch-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.epoch-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.epoch-stats .label {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.epoch-stats .value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.epoch-stats .countdown {
+  font-family: 'Monaco', 'Consolas', monospace;
+  color: #fbbf24;
+}
+
+/* Pending Distribution */
+.pending-distribution {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.pending-distribution h3 {
+  margin: 0 0 16px 0;
+  color: #fbbf24;
+  font-size: 1.1rem;
+}
+
+.pending-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.pending-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.pending-stats .stat.treasury {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.pending-stats .stat.burn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pending-stats .label {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.pending-stats .value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Flow Diagram */
+.flow-diagram {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.flow-diagram h3 {
+  margin: 0 0 20px 0;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.flow-chart {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 12px;
+  min-width: 100px;
+}
+
+.flow-node.source {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+}
+
+.flow-node.stakers {
+  background: rgba(34, 197, 94, 0.2);
+  border: 2px solid #22c55e;
+}
+
+.flow-node.creator {
+  background: rgba(59, 130, 246, 0.2);
+  border: 2px solid #3b82f6;
+}
+
+.flow-node.treasury {
+  background: rgba(251, 191, 36, 0.2);
+  border: 2px solid #fbbf24;
+}
+
+.flow-node.burn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 2px solid #ef4444;
+}
+
+.node-label {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+.node-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.flow-arrow {
+  font-size: 2rem;
+  color: #6366f1;
+}
+
+.flow-distribution {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Wallet Balances */
+.wallet-balances {
+  margin-bottom: 20px;
+}
+
+.wallet-balances h3 {
+  margin: 0 0 16px 0;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.wallets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.wallet-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.wallet-card:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.wallet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wallet-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.explorer-link {
+  font-size: 0.8rem;
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.explorer-link:hover {
+  text-decoration: underline;
+}
+
+.wallet-address {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.wallet-balances-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.balance.hnch {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.balance.ton {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.balance-label {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.balance-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.jetton-wallet {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.jetton-wallet .label {
+  margin-right: 4px;
+}
+
+.jetton-wallet a {
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.jetton-wallet a:hover {
+  text-decoration: underline;
+}
+
+/* Contract Addresses */
+.contract-addresses {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.contract-addresses h3 {
+  margin: 0 0 16px 0;
+  color: #888;
+  font-size: 1rem;
+}
+
+.addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.address-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contract-name {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.address-item a {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.75rem;
+  color: #6366f1;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.address-item a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .token-flow-section {
+    padding: 16px;
+  }
+
+  .flow-chart {
+    flex-direction: column;
+  }
+
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+
+  .wallets-grid {
+    grid-template-columns: 1fr;
+  }
+}
