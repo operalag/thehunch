@@ -1,7 +1,7 @@
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { NetworkSwitcher } from './NetworkSwitcher';
 
-const APP_VERSION = 'RC-260126-A'; // Release Candidate - V6.3 ICC Markets, Staking Verified
+const APP_VERSION = 'RC-260126-B'; // Release Candidate B - Domain fix, Staking Verified
 
 export function Header() {
   return (
