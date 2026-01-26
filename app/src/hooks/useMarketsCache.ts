@@ -300,16 +300,19 @@ export function useMarketsCache(): UseMarketsResult {
       }
 
       // Fetch markets from Supabase
-      // Filter to only show V6.3+ markets:
-      // - Testnet: ID >= 101 (V6.3 markets are 101-104, new markets get higher IDs)
-      // - Mainnet: ID >= 201 (V6.3 markets are 201-203, new markets get higher IDs)
+      // Filter to only show V6.3 markets:
+      // - Testnet: ID 101-999 (V6.3 markets are 101-104)
+      // - Mainnet: ID 201-999 (V6.3 markets are 201-203)
+      // This excludes old V6.2 markets which have very large IDs (1769380451+)
       const minId = network === 'testnet' ? 101 : 201;
+      const maxId = 999; // Exclude V6.2 markets with large IDs
 
       const { data: marketRows, error: fetchError } = await supabase
         .from('markets')
         .select('*')
         .eq('network', network)
         .gte('id', minId)
+        .lte('id', maxId)
         .order('id', { ascending: false });
 
       if (fetchError) {

@@ -1,7 +1,7 @@
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { NetworkSwitcher } from './NetworkSwitcher';
 
-const APP_VERSION = 'v2.3.1'; // V6.3 ICC Markets only
+const APP_VERSION = 'v2.3.2'; // V6.3 ICC Markets only
 
 export function Header() {
   return (
