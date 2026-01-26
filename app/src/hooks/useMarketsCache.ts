@@ -1,16 +1,176 @@
 /**
- * useMarketsCache - Fetch markets from Supabase cache
+ * useMarketsCache - Fetch markets from Supabase cache or use hardcoded V6.3 markets
  *
  * This hook provides instant loading of markets by reading from Supabase cache
  * instead of making 50-100 API calls to the blockchain.
  *
- * The cache is populated by a separate edge function that runs periodically
- * or can be triggered manually.
+ * For testnet, V6.3 markets are hardcoded since they were deployed on-chain
+ * but couldn't be inserted into Supabase (requires service role key).
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, isCacheEnabled, getNetwork } from '../config/supabase';
 import type { MarketRow } from '../config/supabase';
+
+// ============================================================================
+// V6.3 TESTNET MARKETS (Deployed 2026-01-26)
+// These are hardcoded because Supabase insert requires service role key
+// ============================================================================
+const V6_3_TESTNET_MARKETS: MarketRow[] = [
+  {
+    id: 104,
+    network: 'testnet',
+    address: 'kQCQueuPJYMfDofROv0rYyevQwMGk4AI46vAq_JQPQkHNrdM',
+    question: 'Will at least one Associate Member team qualify for the Super 8 stage?',
+    rules: `Market resolves YES if any Associate Member team (non-Full Member of ICC) is among the eight teams that qualify for the Super 8 stage.
+
+Associate Member teams in this tournament: USA, Scotland (replaced Bangladesh), Nepal, Namibia, Italy (debut), Oman, Papua New Guinea, Uganda.
+
+Market resolves NO if all eight Super 8 qualifiers are Full Member nations (India, Pakistan, Australia, England, South Africa, New Zealand, West Indies, Sri Lanka, Afghanistan, Ireland).
+
+Group stage concludes February 20, 2026. Super 8 teams are confirmed immediately after all group matches complete.`,
+    resolution_source: 'Official ICC Group Stage standings and Super 8 qualification at icc-cricket.com',
+    resolution_deadline: 1771632000, // February 21, 2026 00:00 UTC
+    proposal_start_time: 1771632300,
+    created_at: 1737881723,
+    creator: '',
+    status: 'open',
+    proposed_outcome: null,
+    current_bond: null,
+    escalation_count: null,
+    can_propose_now: null,
+    category: 'cricket',
+    proposed_at: null,
+    challenge_deadline: null,
+    veto_guard_address: null,
+    veto_end: null,
+    veto_count: null,
+    support_count: null,
+    current_answer: null,
+    rebate_creator: null,
+    rebate_amount: null,
+    rebate_claimed: null,
+    resolver_address: null,
+    resolver_reward: null,
+    resolver_claimed: null,
+    cached_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 103,
+    network: 'testnet',
+    address: 'kQAhDEt2GwdhEd0VGuYzPEX7zUaUBFimx6qgPUWHk-Bnwo7J',
+    question: 'Will the 2026 T20 World Cup Final be held in Ahmedabad?',
+    rules: `Market resolves YES if the ICC Men's T20 World Cup 2026 Final is played at the Narendra Modi Stadium in Ahmedabad, India.
+
+Market resolves NO if the final is played at R. Premadasa Stadium in Colombo, Sri Lanka, or any other venue.
+
+Per ICC rules: If Pakistan qualifies for the final, the venue shifts from Ahmedabad to Colombo for security/political reasons.
+
+Resolution becomes possible after Semi-Final 2 concludes on March 5, 2026, when both finalists are confirmed.`,
+    resolution_source: 'Official ICC tournament page and venue confirmation at icc-cricket.com',
+    resolution_deadline: 1772755200, // March 6, 2026 00:00 UTC
+    proposal_start_time: 1772755500,
+    created_at: 1737881791,
+    creator: '',
+    status: 'open',
+    proposed_outcome: null,
+    current_bond: null,
+    escalation_count: null,
+    can_propose_now: null,
+    category: 'cricket',
+    proposed_at: null,
+    challenge_deadline: null,
+    veto_guard_address: null,
+    veto_end: null,
+    veto_count: null,
+    support_count: null,
+    current_answer: null,
+    rebate_creator: null,
+    rebate_amount: null,
+    rebate_claimed: null,
+    resolver_address: null,
+    resolver_reward: null,
+    resolver_claimed: null,
+    cached_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 102,
+    network: 'testnet',
+    address: 'kQDAQgBDY8HkA6Jn-gmPgE95Q_X-J2RRdesOC6kqDJ61oHvL',
+    question: 'Will India win the 2026 ICC Men\'s T20 World Cup?',
+    rules: `Market resolves YES if India is officially declared the winner of the ICC Men's T20 World Cup 2026 Final by the International Cricket Council (ICC).
+
+Market resolves NO if:
+- Any other team wins the tournament
+- India is eliminated before the final
+- The tournament is cancelled or abandoned without a winner being declared
+
+Note: If the final extends to the reserve day (March 9, 2026), resolution accounts for this. Super overs and DLS-adjusted results are valid outcomes.
+
+Final scheduled: March 8, 2026, 7:00 PM IST at Narendra Modi Stadium, Ahmedabad (or Colombo if Pakistan in final).`,
+    resolution_source: 'Official ICC website (icc-cricket.com) and ESPNcricinfo match center',
+    resolution_deadline: 1773100800, // March 10, 2026 00:00 UTC
+    proposal_start_time: 1773101100,
+    created_at: 1737881753,
+    creator: '',
+    status: 'open',
+    proposed_outcome: null,
+    current_bond: null,
+    escalation_count: null,
+    can_propose_now: null,
+    category: 'cricket',
+    proposed_at: null,
+    challenge_deadline: null,
+    veto_guard_address: null,
+    veto_end: null,
+    veto_count: null,
+    support_count: null,
+    current_answer: null,
+    rebate_creator: null,
+    rebate_amount: null,
+    rebate_claimed: null,
+    resolver_address: null,
+    resolver_reward: null,
+    resolver_claimed: null,
+    cached_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 101,
+    network: 'testnet',
+    address: 'kQDfp5UzzqG0fgn20V_waUKdRibJBSqvcbu7xkhao4uNRL7a',
+    question: 'Will this resolve to YES? (V6.3 Test Market)',
+    rules: 'Test market for V6.3 deployment verification. This market is for testing the proposal/challenge/settlement flow.',
+    resolution_source: 'Manual resolution for testing',
+    resolution_deadline: 1737889800, // Already passed - was ~2h after deployment
+    proposal_start_time: 1737890100,
+    created_at: 1737881723,
+    creator: '',
+    status: 'open',
+    proposed_outcome: null,
+    current_bond: null,
+    escalation_count: null,
+    can_propose_now: null,
+    category: 'other',
+    proposed_at: null,
+    challenge_deadline: null,
+    veto_guard_address: null,
+    veto_end: null,
+    veto_count: null,
+    support_count: null,
+    current_answer: null,
+    rebate_creator: null,
+    rebate_amount: null,
+    rebate_claimed: null,
+    resolver_address: null,
+    resolver_reward: null,
+    resolver_claimed: null,
+    cached_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
 
 // Re-export the Market type and MarketCategory for compatibility
 export type MarketCategory = 'cricket' | 'champions_league' | 'soccer_world_cup' | 'winter_olympics' | 'other';
@@ -110,19 +270,35 @@ export function useMarketsCache(): UseMarketsResult {
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const fetchMarketsFromCache = useCallback(async () => {
-    if (!isCacheEnabled() || !supabase) {
-      setError('Supabase cache not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError(null);
-    setLoadingProgress({ total: 0, loaded: 0, status: 'Loading markets from cache...' });
+    setLoadingProgress({ total: 0, loaded: 0, status: 'Loading markets...' });
 
     const network = getNetwork();
 
     try {
+      // Use Supabase for both testnet and mainnet
+      if (!isCacheEnabled() || !supabase) {
+        // Fallback to hardcoded V6.3 markets for testnet if Supabase unavailable
+        if (network === 'testnet') {
+          const transformedMarkets = V6_3_TESTNET_MARKETS.map(transformRowToMarket);
+          setMarkets(transformedMarkets);
+          setCacheSource('supabase');
+          setLastRefreshed(new Date());
+          setLoadingProgress({
+            total: transformedMarkets.length,
+            loaded: transformedMarkets.length,
+            status: `Loaded ${transformedMarkets.length} V6.3 markets (fallback)`
+          });
+          setTimeout(() => setLoadingProgress(null), 2000);
+          setLoading(false);
+          return;
+        }
+        setError('Supabase cache not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+        setLoading(false);
+        return;
+      }
+
       // Fetch markets from Supabase
       const { data: marketRows, error: fetchError } = await supabase
         .from('markets')
