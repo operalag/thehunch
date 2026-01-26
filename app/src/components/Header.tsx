@@ -1,7 +1,7 @@
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { NetworkSwitcher } from './NetworkSwitcher';
 
-const APP_VERSION = 'v2.2.0';
+const APP_VERSION = 'v2.2.1';
 
 export function Header() {
   return (

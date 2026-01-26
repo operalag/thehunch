@@ -60,6 +60,11 @@ interface UseMarketsResult {
  * Transform Supabase row to Market interface
  */
 function transformRowToMarket(row: MarketRow): Market {
+  // Calculate canProposeNow dynamically based on current time vs proposal_start_time
+  // This ensures the UI shows correct state even if Supabase cache isn't updated
+  const now = Math.floor(Date.now() / 1000);
+  const canProposeNow = row.status === 'open' && row.proposal_start_time <= now;
+
   return {
     id: row.id,
     address: row.address,
@@ -74,7 +79,7 @@ function transformRowToMarket(row: MarketRow): Market {
     proposedOutcome: row.proposed_outcome ?? undefined,
     currentBond: row.current_bond ?? undefined,
     escalationCount: row.escalation_count ?? undefined,
-    canProposeNow: row.can_propose_now ?? undefined,
+    canProposeNow: canProposeNow,
     category: row.category as MarketCategory,
     proposedAt: row.proposed_at ?? undefined,
     challengeDeadline: row.challenge_deadline ?? undefined,
