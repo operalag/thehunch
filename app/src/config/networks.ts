@@ -34,7 +34,7 @@ export const TESTNET_CONFIG: NetworkConfig = {
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
 
-// Mainnet Configuration - V6.2 deployed 2026-01-26 (CRITICAL: fixed stake_snapshots dict loading)
+// Mainnet Configuration - V6.3 deployed 2026-01-27 (FIXED: Fee Distributor master_address)
 export const MAINNET_CONFIG: NetworkConfig = {
   name: 'mainnet',
   displayName: 'Mainnet',
@@ -44,7 +44,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
   contracts: {
     HNCH_JETTON_MASTER: 'EQD529CGTmX1Tgcsn3vYBfUPKrVdgermb1T8o5MKLGOGdHpb',
     MASTER_ORACLE: 'EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J',
-    FEE_DISTRIBUTOR: 'EQAv8Slzak1IAK_iBWNDNO6DR2q7G4idV3ThM9kMYOnB1oXt',
+    FEE_DISTRIBUTOR: 'EQBplZMDqiykFOIcME0LtYwe55p1SJ9YxKNjXnPs7n6mVHxE',  // Redeployed with correct master_address
   },
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
