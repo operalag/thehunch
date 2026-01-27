@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { useContract } from '../hooks/useContract';
 import { useJettonBalance } from '../hooks/useJettonBalance';
@@ -75,6 +75,29 @@ export function Stake() {
   const [unstakeAmount, setUnstakeAmount] = useState('');
   const [isUnstaking, setIsUnstaking] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+
+  // Live countdown states
+  const [epochCountdown, setEpochCountdown] = useState(timeUntilNextEpoch);
+  const [unlockCountdown, setUnlockCountdown] = useState(timeUntilUnlock);
+
+  // Sync countdown states when hook values change (e.g., after refetch)
+  useEffect(() => {
+    setEpochCountdown(timeUntilNextEpoch);
+  }, [timeUntilNextEpoch]);
+
+  useEffect(() => {
+    setUnlockCountdown(timeUntilUnlock);
+  }, [timeUntilUnlock]);
+
+  // Live countdown timer - decrements every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setEpochCountdown(prev => prev > 0 ? prev - 1 : 0);
+      setUnlockCountdown(prev => prev > 0 ? prev - 1 : 0);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   // Calculate max amount (balance in HNCH, not nano)
   const maxAmount = (Number(balance) / 1e9).toString();
@@ -236,10 +259,10 @@ export function Stake() {
                   <span className="epoch-label">Current Epoch</span>
                   <span className="epoch-number">#{currentEpoch}</span>
                 </div>
-                {timeUntilNextEpoch > 0 && (
+                {epochCountdown > 0 && (
                   <div className="epoch-countdown">
                     <span className="countdown-label">Next epoch in:</span>
-                    <span className="countdown-value">{formatCountdown(timeUntilNextEpoch)}</span>
+                    <span className="countdown-value">{formatCountdown(epochCountdown)}</span>
                   </div>
                 )}
               </div>
@@ -327,11 +350,11 @@ export function Stake() {
               <span className="requirement-icon">{hasEnoughForVeto ? '✓' : '○'}</span>
               <span>Stake 2M+ HNCH (2% of supply)</span>
             </div>
-            <div className={`requirement ${timeUntilUnlock <= 0 && hasStake ? 'met' : 'unmet'}`}>
-              <span className="requirement-icon">{timeUntilUnlock <= 0 && hasStake ? '✓' : '○'}</span>
+            <div className={`requirement ${unlockCountdown <= 0 && hasStake ? 'met' : 'unmet'}`}>
+              <span className="requirement-icon">{unlockCountdown <= 0 && hasStake ? '✓' : '○'}</span>
               <span>Staked for 24+ hours</span>
-              {timeUntilUnlock > 0 && (
-                <span className="time-remaining">({formatCountdown(timeUntilUnlock)} remaining)</span>
+              {unlockCountdown > 0 && (
+                <span className="time-remaining">({formatCountdown(unlockCountdown)} remaining)</span>
               )}
             </div>
           </div>
@@ -392,12 +415,12 @@ export function Stake() {
         {hasStake ? (
           <>
             {/* Lock countdown display */}
-            {timeUntilUnlock > 0 ? (
+            {unlockCountdown > 0 ? (
               <div className="lock-countdown">
                 <span className="lock-icon">🔒</span>
                 <div className="countdown-info">
                   <span className="countdown-label">Time until unlock:</span>
-                  <span className="countdown-timer">{formatCountdown(timeUntilUnlock)}</span>
+                  <span className="countdown-timer">{formatCountdown(unlockCountdown)}</span>
                 </div>
               </div>
             ) : canUnstake ? (
@@ -426,13 +449,13 @@ export function Stake() {
                     onChange={(e) => setUnstakeAmount(e.target.value)}
                     placeholder="0.00"
                     required
-                    disabled={!canUnstake && timeUntilUnlock > 0}
+                    disabled={!canUnstake && unlockCountdown > 0}
                   />
                   <button
                     type="button"
                     className="max-btn"
                     onClick={() => setUnstakeAmount(maxUnstakeAmount)}
-                    disabled={!canUnstake && timeUntilUnlock > 0}
+                    disabled={!canUnstake && unlockCountdown > 0}
                   >
                     MAX
                   </button>
@@ -440,11 +463,11 @@ export function Stake() {
               </div>
               <button
                 type="submit"
-                disabled={isUnstaking || (!canUnstake && timeUntilUnlock > 0)}
-                className={canUnstake || timeUntilUnlock === 0 ? "unstake-btn-active" : "unstake-btn-locked"}
+                disabled={isUnstaking || (!canUnstake && unlockCountdown > 0)}
+                className={canUnstake || unlockCountdown === 0 ? "unstake-btn-active" : "unstake-btn-locked"}
               >
                 {isUnstaking ? 'Requesting...' :
-                  (!canUnstake && timeUntilUnlock > 0) ? 'Locked' : 'Request Unstake'}
+                  (!canUnstake && unlockCountdown > 0) ? 'Locked' : 'Request Unstake'}
               </button>
             </form>
           </>
