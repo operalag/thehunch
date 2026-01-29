@@ -143,7 +143,7 @@ export function Markets() {
   const userAddress = useTonAddress();
   const { createMarket, proposeOutcome, challengeOutcome, settleMarket, castVeto, counterVeto, finalizeVeto, claimCreatorRebate, claimResolverReward, claimReward, MIN_BOND_HNCH, MARKET_CREATION_FEE_HNCH } = useContract();
   const { formattedBalance, balance } = useJettonBalance();
-  const { markets: fetchedMarkets, loading: marketsLoading, refetch: refetchMarkets, syncMarkets, loadingProgress } = useMarkets();
+  const { markets: fetchedMarkets, loading: marketsLoading, refetch: refetchMarkets, syncMarkets, updateMarketStatus, loadingProgress } = useMarkets();
   const stakingInfo = useStakingInfo();
 
   // Sync markets state
@@ -770,8 +770,13 @@ export function Markets() {
     setIsSettling(market.address);
     try {
       await settleMarket(market.address);
-      alert('Settle transaction sent! The market will be resolved after blockchain confirmation.');
-      refetchMarkets();
+
+      // Wait for transaction to be processed on blockchain, then update status
+      // TON typically confirms in 5-10 seconds
+      await new Promise(resolve => setTimeout(resolve, 8000));
+      await updateMarketStatus(market.address);
+
+      alert('Market settled successfully! You earned 500 HNCH as resolver reward.');
     } catch (error: any) {
       console.error('Failed to settle:', error);
       alert(error.message || 'Failed to settle market. Please try again.');

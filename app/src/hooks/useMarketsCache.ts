@@ -211,6 +211,8 @@ interface UseMarketsResult {
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
+  syncMarkets: (network?: 'mainnet' | 'testnet' | 'both', force?: boolean) => Promise<{ success: boolean; totalMarketsAdded: number; error?: string }>;
+  updateMarketStatus: (marketAddress: string, network?: 'mainnet' | 'testnet') => Promise<{ success: boolean; error?: string }>;
   loadingProgress: { total: number; loaded: number; status: string } | null;
   cacheSource: 'supabase' | 'none';
   lastRefreshed: Date | null;
@@ -300,20 +302,19 @@ export function useMarketsCache(): UseMarketsResult {
       }
 
       // Fetch markets from Supabase
-      // Filter to only show V6.3 markets:
-      // - Testnet: ID 101-999 (V6.3 markets are 101-104)
-      // - Mainnet: ID 201-999 (V6.3 markets are 201-203)
-      // This excludes old V6.2 markets which have very large IDs (1769380451+)
-      const minId = network === 'testnet' ? 101 : 201;
-      const maxId = 999; // Exclude V6.2 markets with large IDs
+      // Filter by creation time to include:
+      // - V6.3 markets (deployed Jan 25-26, 2026)
+      // - New markets created via frontend
+      // Cutoff: Jan 25, 2026 00:00 UTC (Unix timestamp 1769299200)
+      // This excludes old V6.2 markets which were created earlier
+      const V6_3_DEPLOYMENT_CUTOFF = 1769299200; // Jan 25, 2026 00:00 UTC
 
       const { data: marketRows, error: fetchError } = await supabase
         .from('markets')
         .select('*')
         .eq('network', network)
-        .gte('id', minId)
-        .lte('id', maxId)
-        .order('id', { ascending: false });
+        .gte('created_at', V6_3_DEPLOYMENT_CUTOFF)
+        .order('created_at', { ascending: false });
 
       if (fetchError) {
         // Check if table doesn't exist yet
@@ -360,6 +361,86 @@ export function useMarketsCache(): UseMarketsResult {
     }
   }, []);
 
+  // Sync markets by calling the Supabase Edge Function
+  const syncMarkets = useCallback(async (
+    network: 'mainnet' | 'testnet' | 'both' = 'both',
+    force = false
+  ): Promise<{ success: boolean; totalMarketsAdded: number; error?: string }> => {
+    if (!isCacheEnabled() || !supabase) {
+      return {
+        success: false,
+        totalMarketsAdded: 0,
+        error: 'Supabase not configured',
+      };
+    }
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/sync-markets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ network, force }),
+      });
+
+      const result = await response.json();
+
+      // Refetch markets after sync
+      if (result.success && result.totalMarketsAdded > 0) {
+        await fetchMarketsFromCache();
+      }
+
+      return {
+        success: result.success,
+        totalMarketsAdded: result.totalMarketsAdded || 0,
+        error: result.error,
+      };
+    } catch (error: any) {
+      console.error('[useMarketsCache] Sync error:', error);
+      return {
+        success: false,
+        totalMarketsAdded: 0,
+        error: error.message || 'Failed to sync markets',
+      };
+    }
+  }, [fetchMarketsFromCache]);
+
+  // Update a single market's status from blockchain
+  const updateMarketStatus = useCallback(async (
+    marketAddress: string,
+    network: 'mainnet' | 'testnet' = 'mainnet'
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!isCacheEnabled() || !supabase) {
+      return { success: false, error: 'Supabase not configured' };
+    }
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/sync-markets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ network, update_status: true, market_address: marketAddress }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Refresh the markets list to show updated status
+        await fetchMarketsFromCache();
+      }
+
+      return { success: result.success, error: result.error };
+    } catch (error: any) {
+      console.error('[useMarketsCache] Update status error:', error);
+      return { success: false, error: error.message || 'Failed to update market status' };
+    }
+  }, [fetchMarketsFromCache]);
+
   // Fetch on mount - no automatic refresh
   useEffect(() => {
     fetchMarketsFromCache();
@@ -370,6 +451,8 @@ export function useMarketsCache(): UseMarketsResult {
     loading,
     error,
     refetch: fetchMarketsFromCache,
+    syncMarkets,
+    updateMarketStatus,
     loadingProgress,
     cacheSource,
     lastRefreshed,
