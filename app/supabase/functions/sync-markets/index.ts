@@ -514,6 +514,39 @@ async function updateMarketStatus(
       updated_at: new Date().toISOString(),
     };
 
+    // For proposed/challenged states, get proposal info from transactions
+    if (state === 1 || state === 2) {
+      const txData = await fetchTransactions(network, marketAddress, undefined, 50);
+      if (txData.transactions) {
+        // Find the earliest propose transaction
+        for (const tx of [...txData.transactions].reverse()) {
+          const opCode = tx.in_msg?.op_code?.toLowerCase();
+          if (opCode === '0x7362d09c' && tx.success) {
+            // Jetton transfer - check for propose in decoded body
+            const decodedBody = tx.in_msg?.decoded_body;
+            if (decodedBody?.forward_payload?.value?.op_code === 16) {
+              // Found propose transaction
+              const rawBody = tx.in_msg?.raw_body || '';
+              const proposeIndex = rawBody.toLowerCase().indexOf('00000010');
+              if (proposeIndex !== -1) {
+                const answerOffset = proposeIndex + 8 + 16;
+                if (answerOffset + 2 <= rawBody.length) {
+                  const answerByte = parseInt(rawBody.substring(answerOffset, answerOffset + 2), 16);
+                  const answer = (answerByte & 0x80) !== 0;
+                  updateData.proposed_outcome = answer;
+                  updateData.proposed_at = tx.utime;
+                  // Challenge deadline is 4 hours (14400 seconds) from proposal
+                  updateData.challenge_deadline = tx.utime + 14400;
+                  console.log(`[updateMarketStatus] Found proposal: answer=${answer}, deadline=${updateData.challenge_deadline}`);
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+
     // If resolved, set the current_answer based on proposed_outcome (no challenges = proposal wins)
     if (state === 4) {
       // Get the market's proposed_outcome from DB

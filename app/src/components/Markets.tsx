@@ -76,6 +76,25 @@ function BondHistorySection({ market, isExpanded, onToggle, formatTimeSince }: B
   );
 }
 
+// Helper to normalize TON addresses for comparison
+// Handles both bounceable (EQ...) and non-bounceable (UQ...) formats
+function normalizeTonAddress(address: string): string {
+  try {
+    // TON friendly address is base64url encoded
+    // Format: tag(1) + workchain(1) + hash(32) + crc(2) = 36 bytes
+    // We extract the hash (32 bytes) for comparison
+    const base64 = address.replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = atob(base64);
+    // Skip tag(1) + workchain(1), take hash(32 bytes)
+    const hashBytes = decoded.slice(2, 34);
+    // Convert to hex for comparison
+    return Array.from(hashBytes).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('').toLowerCase();
+  } catch {
+    // Fallback to lowercase comparison if decoding fails
+    return address.toLowerCase();
+  }
+}
+
 // Child component for Bond Claim - properly uses hooks at top level
 interface BondClaimSectionProps {
   market: Market;
@@ -90,9 +109,11 @@ function BondClaimSection({ market, userAddress, isClaimingBonds, onClaimBonds }
   // Check if current user can claim
   const canClaim = () => {
     if (!userAddress || !winner) return false;
-    const userNormalized = userAddress.toLowerCase();
-    const participantNormalized = winner.participant.participantAddress.toLowerCase();
-    return market.status === 'resolved' && userNormalized === participantNormalized;
+    // Normalize both addresses to compare the hash portion
+    // This handles UQ... (non-bounceable) vs EQ... (bounceable) being the same address
+    const userHash = normalizeTonAddress(userAddress);
+    const participantHash = normalizeTonAddress(winner.participant.participantAddress);
+    return market.status === 'resolved' && userHash === participantHash;
   };
 
   if (!winner || !canClaim()) return null;
