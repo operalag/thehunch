@@ -1,7 +1,7 @@
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { NetworkSwitcher } from './NetworkSwitcher';
 
-const APP_VERSION = '5.0.0'; // Fix epochs display and auto-update market status
+const APP_VERSION = '5.0.1'; // Clarify epoch rewards UI - accumulating vs claimable
 
 export function Header() {
   return (

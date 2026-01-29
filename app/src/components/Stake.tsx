@@ -286,27 +286,36 @@ export function Stake() {
 
             <div className="claim-info">
               <div className="claim-amount">
-                <span className="claim-label">Available to Claim:</span>
+                <span className="claim-label">
+                  {claimableEpochs > 0 ? 'Ready to Claim:' : 'Accumulating This Epoch:'}
+                </span>
                 <span className="claim-value">{formattedUserPendingRewards} HNCH</span>
               </div>
               <p className="claim-description">
-                Rewards are distributed proportionally based on your stake.
-                {Number(pendingStakerRewards) > 0 && (
-                  <span className="total-pool">
-                    {' '}Total pool: {(Number(pendingStakerRewards) / 1e9).toLocaleString()} HNCH
-                  </span>
+                {claimableEpochs > 0 ? (
+                  <>Your share of completed epoch rewards. Claim now!</>
+                ) : (
+                  <>
+                    Rewards accumulate during each 24h epoch.
+                    Your share will be claimable when the current epoch ends.
+                    {Number(pendingStakerRewards) > 0 && (
+                      <span className="total-pool">
+                        {' '}Total pool: {(Number(pendingStakerRewards) / 1e9).toLocaleString()} HNCH
+                      </span>
+                    )}
+                  </>
                 )}
               </p>
             </div>
             <div className="claim-btn-row">
               <button
-                className={`claim-btn ${hasPendingRewards ? 'has-rewards' : ''}`}
+                className={`claim-btn ${claimableEpochs > 0 && hasPendingRewards ? 'has-rewards' : ''}`}
                 onClick={handleClaimRewards}
                 disabled={isClaiming || !hasPendingRewards || claimableEpochs === 0}
               >
                 {isClaiming ? 'Claiming...' :
                   claimableEpochs > 0 && hasPendingRewards ? `Claim Rewards (${claimableEpochs} epoch${claimableEpochs > 1 ? 's' : ''})` :
-                  'No Rewards Available'}
+                  'Waiting for Epoch to Complete'}
               </button>
               <ClaimInfoTooltip />
             </div>
