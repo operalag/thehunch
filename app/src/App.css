@@ -3134,6 +3134,443 @@ button:disabled {
   }
 }
 
+/* ===== Week 3 Challenge UX Improvements Styles ===== */
+
+/* TASK 2: Bond Escalation Schedule Visualization */
+.bond-escalation-schedule {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.bond-escalation-schedule .escalation-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bond-escalation-schedule .escalation-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.escalation-step-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.escalation-step-card.past {
+  background: rgba(107, 114, 128, 0.2);
+  border-color: rgba(107, 114, 128, 0.4);
+  opacity: 0.6;
+}
+
+.escalation-step-card.current {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.15));
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  transform: scale(1.05);
+}
+
+.escalation-step-card.future {
+  background: var(--surface);
+  border-color: var(--border);
+  opacity: 0.7;
+}
+
+.escalation-step-card .step-number {
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.escalation-step-card.current .step-number {
+  background: var(--secondary);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.escalation-step-card .step-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.escalation-step-card.current .step-amount {
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.escalation-step-card .you-are-here {
+  background: var(--secondary);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.escalation-step-card .next-required {
+  background: var(--warning);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.bond-escalation-schedule .escalation-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.bond-escalation-schedule .escalation-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.bond-escalation-schedule .escalation-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* TASK 3: Risk/Reward Calculator */
+.risk-reward-calculator {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(239, 68, 68, 0.1));
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+.risk-reward-calculator .calculator-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.risk-reward-calculator .calculator-icon {
+  font-size: 1.5rem;
+}
+
+.risk-reward-calculator .calculator-header h5 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.risk-reward-calculator .calculator-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.reward-section,
+.risk-section,
+.roi-section {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.reward-section {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.risk-section {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.roi-section {
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.reward-label,
+.risk-label,
+.roi-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reward-amount,
+.risk-amount,
+.roi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.reward-amount.win {
+  color: var(--secondary);
+}
+
+.risk-amount.lose {
+  color: var(--danger);
+}
+
+.roi-value.positive {
+  color: var(--secondary);
+}
+
+.roi-value.negative {
+  color: var(--danger);
+}
+
+.reward-breakdown,
+.risk-breakdown {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* TASK 4: Bond History Timeline */
+.bond-history-section {
+  margin: 1rem 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.history-toggle-btn {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background: var(--surface-light);
+  border: none;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.history-toggle-btn:hover {
+  background: var(--border);
+}
+
+.history-toggle-btn .toggle-icon {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.history-toggle-btn .toggle-text {
+  flex: 1;
+  text-align: left;
+}
+
+.bond-history-timeline {
+  padding: 1.25rem;
+  background: var(--surface);
+}
+
+.timeline-event {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-event:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.timeline-marker .marker-dot {
+  width: 16px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.timeline-marker .marker-line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(to bottom, var(--primary), var(--border));
+  margin-top: 0.25rem;
+  min-height: 40px;
+}
+
+.timeline-content {
+  flex: 1;
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.timeline-content .event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-content .event-action {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.timeline-content .event-action.propose {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--primary);
+}
+
+.timeline-content .event-action.challenge {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+}
+
+.timeline-content .event-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.timeline-content .event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.timeline-content .event-answer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timeline-content .answer-badge {
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.timeline-content .answer-badge.yes {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--secondary);
+}
+
+.timeline-content .answer-badge.no {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+}
+
+.timeline-content .event-bond strong {
+  color: var(--warning);
+}
+
+.timeline-content .participant-address {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.timeline-content .winner-badge {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 197, 94, 0.1));
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 6px;
+  font-weight: 700;
+  color: var(--secondary);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsive for Week 3 */
+@media (max-width: 768px) {
+  .bond-escalation-schedule .escalation-steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .escalation-step-card {
+    padding: 0.5rem;
+  }
+
+  .escalation-step-card .step-amount {
+    font-size: 0.75rem;
+  }
+
+  .risk-reward-calculator .calculator-content {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .reward-amount,
+  .risk-amount,
+  .roi-value {
+    font-size: 1.25rem;
+  }
+
+  .timeline-event {
+    gap: 0.75rem;
+  }
+
+  .timeline-content {
+    padding: 0.75rem;
+  }
+
+  .timeline-content .event-details {
+    font-size: 0.8rem;
+  }
+}
+
 /* ===== Sync Markets UI Styles ===== */
 
 .markets-header-actions {

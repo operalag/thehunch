@@ -474,8 +474,8 @@ export function useMarkets(): UseMarketsResult {
         let supportCount: number | undefined;
         let currentAnswer: boolean | undefined;
 
-        // Challenge period: 2 hours for initial proposal, 4 hours after escalation
-        const INITIAL_CHALLENGE_PERIOD_SECONDS = 2 * 60 * 60;
+        // Challenge period: 4 hours for all proposals (updated from 2 hours)
+        const INITIAL_CHALLENGE_PERIOD_SECONDS = 4 * 60 * 60;
 
         if (state === STATE_PROPOSED || state === STATE_CHALLENGED) {
           try {

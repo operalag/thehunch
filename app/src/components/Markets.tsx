@@ -146,6 +146,8 @@ export function Markets() {
   const [isClaimingResolver, setIsClaimingResolver] = useState<string | null>(null);
   // Bond claim state
   const [isClaimingBonds, setIsClaimingBonds] = useState<string | null>(null);
+  // Bond history expansion state
+  const [expandedHistory, setExpandedHistory] = useState<Set<number>>(new Set());
   const [countdowns, setCountdowns] = useState<Record<string, {
     vetoCountdown?: string;
     challengeCountdown?: string;
@@ -249,8 +251,12 @@ export function Markets() {
   // 2% of 100M HNCH = 2M HNCH required for veto
   const VETO_THRESHOLD_HNCH = 2_000_000;
   const VETO_LOCK_PERIOD = 24 * 60 * 60; // 24 hours in seconds
-  const INITIAL_CHALLENGE_PERIOD_SECONDS = 2 * 60 * 60; // 2 hours (first proposal)
+  const INITIAL_CHALLENGE_PERIOD_SECONDS = 4 * 60 * 60; // 4 hours (updated from 2 hours)
   const VETO_PERIOD_SECONDS = 48 * 60 * 60; // 48 hours
+
+  // Bond escalation schedule and rewards
+  const BOND_SCHEDULE = [10000, 20000, 40000, 80000]; // HNCH
+  const WINNER_BONUS = 2000; // HNCH
 
   // Helper function to format duration
   const formatDuration = (seconds: number): string => {
@@ -290,6 +296,35 @@ export function Markets() {
     const stakeAmount = Number(stakingInfo.userStake) / 1e9;
     const now = Math.floor(Date.now() / 1000);
     return stakeAmount >= VETO_THRESHOLD_HNCH && stakingInfo.lockTime > 0 && now >= stakingInfo.lockTime + VETO_LOCK_PERIOD;
+  };
+
+  // Calculate risk/reward for challenging
+  const calculateChallengeRiskReward = (market: Market) => {
+    const currentBond = market.currentBond || 10000;
+    const requiredBond = currentBond * 2;
+    const potentialWin = requiredBond + currentBond + WINNER_BONUS;
+    const potentialLoss = requiredBond;
+    const roi = ((potentialWin - requiredBond) / requiredBond) * 100;
+
+    return {
+      requiredBond,
+      potentialWin,
+      potentialLoss,
+      roi: Math.round(roi)
+    };
+  };
+
+  // Toggle bond history expansion
+  const toggleHistoryExpansion = (marketId: number) => {
+    setExpandedHistory(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(marketId)) {
+        newSet.delete(marketId);
+      } else {
+        newSet.add(marketId);
+      }
+      return newSet;
+    });
   };
 
   // Calculate countdowns once when markets change - NO automatic timer to prevent memory issues
@@ -1084,6 +1119,42 @@ export function Markets() {
                     </div>
                   )}
 
+                  {/* TASK 2: Bond Escalation Schedule Visualization */}
+                  {(market.status === 'proposed' || market.status === 'challenged') && (
+                    <div className="bond-escalation-schedule">
+                      <h5 className="escalation-title">Bond Escalation Path</h5>
+                      <div className="escalation-steps">
+                        {BOND_SCHEDULE.map((bondAmount, index) => {
+                          const isCurrentLevel = (market.escalationCount || 0) === index;
+                          const isPastLevel = (market.escalationCount || 0) > index;
+                          const isNextLevel = (market.escalationCount || 0) === index - 1;
+
+                          return (
+                            <div
+                              key={index}
+                              className={`escalation-step-card ${
+                                isCurrentLevel ? 'current' : isPastLevel ? 'past' : 'future'
+                              }`}
+                            >
+                              <div className="step-number">{index + 1}</div>
+                              <div className="step-amount">{bondAmount.toLocaleString()} HNCH</div>
+                              {isCurrentLevel && (
+                                <div className="you-are-here">You Are Here</div>
+                              )}
+                              {isNextLevel && (
+                                <div className="next-required">Next Required</div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="escalation-info">
+                        <span className="escalation-label">Current Escalation Level:</span>
+                        <span className="escalation-value">{(market.escalationCount || 0) + 1} of 4</span>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="market-details">
                     {/* Countdown box for open markets waiting for proposals */}
                     {market.status === 'open' && !market.canProposeNow && countdowns[market.address]?.proposalCountdown && (
@@ -1356,6 +1427,70 @@ export function Markets() {
                     )}
                   </div>
 
+                  {/* TASK 4: Bond History Timeline */}
+                  {(market.status === 'proposed' || market.status === 'challenged' || market.status === 'voting' || market.status === 'resolved') && (() => {
+                    const { participants } = useMarketParticipants(market.address, market.currentAnswer);
+
+                    if (participants.length === 0) return null;
+
+                    const isExpanded = expandedHistory.has(market.id);
+
+                    return (
+                      <div className="bond-history-section">
+                        <button
+                          className="history-toggle-btn"
+                          onClick={() => toggleHistoryExpansion(market.id)}
+                        >
+                          <span className="toggle-icon">{isExpanded ? '▼' : '▶'}</span>
+                          <span className="toggle-text">View Market History ({participants.length} event{participants.length !== 1 ? 's' : ''})</span>
+                        </button>
+
+                        {isExpanded && (
+                          <div className="bond-history-timeline">
+                            {participants.map((participant, index) => (
+                              <div key={participant.id} className="timeline-event">
+                                <div className="timeline-marker">
+                                  <div className="marker-dot"></div>
+                                  {index < participants.length - 1 && <div className="marker-line"></div>}
+                                </div>
+                                <div className="timeline-content">
+                                  <div className="event-header">
+                                    <span className={`event-action ${participant.action}`}>
+                                      {participant.action === 'propose' ? '📝 Proposed' : '⚔️ Challenged'}
+                                    </span>
+                                    <span className="event-time">
+                                      {formatTimeSince(participant.timestamp)}
+                                    </span>
+                                  </div>
+                                  <div className="event-details">
+                                    <div className="event-answer">
+                                      Answer: <span className={`answer-badge ${participant.answer ? 'yes' : 'no'}`}>
+                                        {participant.answer ? 'YES' : 'NO'}
+                                      </span>
+                                    </div>
+                                    <div className="event-bond">
+                                      Bond: <strong>{participant.bondAmount.toLocaleString()} HNCH</strong>
+                                    </div>
+                                    <div className="event-participant">
+                                      By: <span className="participant-address">
+                                        {participant.participantAddress.slice(0, 6)}...{participant.participantAddress.slice(-4)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  {market.status === 'resolved' && market.currentAnswer === participant.answer && index === participants.length - 1 && (
+                                    <div className="winner-badge">
+                                      🏆 Winner
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   {/* Actions based on status */}
                   {wallet && (
                     <div className="market-actions">
@@ -1569,6 +1704,45 @@ export function Markets() {
                         </div>
                       )}
 
+                      {/* TASK 3: Risk/Reward Calculator - Show when viewing challenge button */}
+                      {(market.status === 'proposed' || market.status === 'challenged') &&
+                       !isChallengingThis &&
+                       (market.escalationCount || 0) < 3 &&
+                       market.challengeDeadline &&
+                       Math.floor(Date.now() / 1000) < market.challengeDeadline && (() => {
+                        const riskReward = calculateChallengeRiskReward(market);
+                        return (
+                          <div className="risk-reward-calculator">
+                            <div className="calculator-header">
+                              <span className="calculator-icon">📊</span>
+                              <h5>Challenge Risk & Reward</h5>
+                            </div>
+                            <div className="calculator-content">
+                              <div className="reward-section">
+                                <div className="reward-label">If You Win:</div>
+                                <div className="reward-amount win">+{riskReward.potentialWin.toLocaleString()} HNCH</div>
+                                <div className="reward-breakdown">
+                                  (Your bond + opponent's bond + {WINNER_BONUS.toLocaleString()} bonus)
+                                </div>
+                              </div>
+                              <div className="risk-section">
+                                <div className="risk-label">If You Lose:</div>
+                                <div className="risk-amount lose">-{riskReward.potentialLoss.toLocaleString()} HNCH</div>
+                                <div className="risk-breakdown">
+                                  (Your bond forfeited)
+                                </div>
+                              </div>
+                              <div className="roi-section">
+                                <div className="roi-label">Potential ROI:</div>
+                                <div className={`roi-value ${riskReward.roi > 0 ? 'positive' : 'negative'}`}>
+                                  {riskReward.roi > 0 ? '+' : ''}{riskReward.roi}%
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
                       {/* Challenge Form */}
                       {isChallengingThis && (
                         <div className="action-form">
@@ -1636,7 +1810,7 @@ export function Markets() {
             <span className="step-number">3</span>
             <div className="step-content">
               <h4>Resolve</h4>
-              <p>After 2h (initial) or 4h (escalated) without challenge, outcome is final</p>
+              <p>After 4 hours without challenge, outcome is final</p>
             </div>
           </div>
           <div className="step">
