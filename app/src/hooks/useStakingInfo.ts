@@ -255,7 +255,7 @@ export function useStakingInfo(): StakingInfo {
           // Use non-bounceable format for TONAPI
           const nonBounceableAddr = toNonBounceableAddress(address);
           const claimResponse = await fetch(
-            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_user_claim_info?args=${encodeURIComponent(nonBounceableAddr)}`,
+            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_user_last_claim?args=${encodeURIComponent(nonBounceableAddr)}`,
             { headers }
           );
 
@@ -348,13 +348,34 @@ export function useStakingInfo(): StakingInfo {
     }
   }
 
+  // Calculate the ACTUAL current epoch based on time elapsed
+  // The contract may not auto-advance epochs, so we calculate based on time
+  // Epoch duration is 24 hours (86400 seconds)
+  const EPOCH_DURATION = 86400;
+  let actualCurrentEpoch = currentEpoch;
+  let actualTimeUntilNextEpoch = timeUntilNextEpoch;
+
+  if (epochStart > 0) {
+    // Calculate how many complete epochs have passed since epoch start
+    const timeSinceEpochStart = now - epochStart;
+    if (timeSinceEpochStart > 0) {
+      // Each epoch is 24 hours. Calculate which epoch we're actually in.
+      const epochsElapsed = Math.floor(timeSinceEpochStart / EPOCH_DURATION);
+      actualCurrentEpoch = currentEpoch + epochsElapsed;
+
+      // Calculate time until next epoch boundary
+      const timeIntoCurrentEpoch = timeSinceEpochStart % EPOCH_DURATION;
+      actualTimeUntilNextEpoch = EPOCH_DURATION - timeIntoCurrentEpoch;
+    }
+  }
+
   // Calculate claimable epochs
-  // User can claim from (lastClaimedEpoch + 1) to (currentEpoch - 1)
+  // User can claim from (lastClaimedEpoch + 1) to (actualCurrentEpoch - 1)
   // Note: Current epoch is still accumulating, so not claimable yet
   let claimableEpochs = 0;
-  if (currentEpoch > 0) {
+  if (actualCurrentEpoch > 0) {
     const firstClaimableEpoch = userLastClaimedEpoch < 0 ? 0 : userLastClaimedEpoch + 1;
-    const lastClaimableEpoch = currentEpoch - 1; // Current epoch still in progress
+    const lastClaimableEpoch = actualCurrentEpoch - 1; // Current epoch still in progress
     if (lastClaimableEpoch >= firstClaimableEpoch) {
       claimableEpochs = Math.min(30, lastClaimableEpoch - firstClaimableEpoch + 1); // Max 30 per tx
     }
@@ -365,7 +386,11 @@ export function useStakingInfo(): StakingInfo {
     userStake,
     formattedUserStake: formatBalance(userStake),
     loading,
-    address
+    address,
+    contractEpoch: currentEpoch,
+    actualCurrentEpoch,
+    claimableEpochs,
+    epochStart,
   });
 
   return {
@@ -383,10 +408,10 @@ export function useStakingInfo(): StakingInfo {
     formattedUserPendingRewards: formatBalance(userPendingRewards),
     apy,
     lastDistribution,
-    // Epoch info
-    currentEpoch,
+    // Epoch info - use calculated actual values, not raw contract values
+    currentEpoch: actualCurrentEpoch,
     epochStart,
-    timeUntilNextEpoch,
+    timeUntilNextEpoch: actualTimeUntilNextEpoch,
     userLastClaimedEpoch,
     claimableEpochs,
     // Fee Distributor availability
