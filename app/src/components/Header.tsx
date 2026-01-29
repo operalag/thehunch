@@ -1,7 +1,7 @@
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { NetworkSwitcher } from './NetworkSwitcher';
 
-const APP_VERSION = 'RC-260126-B'; // Release Candidate B - Domain fix, Staking Verified
+const APP_VERSION = '5.0.0'; // Fix epochs display and auto-update market status
 
 export function Header() {
   return (
