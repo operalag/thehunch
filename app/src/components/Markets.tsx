@@ -139,6 +139,8 @@ export function Markets() {
   };
   // Settle state
   const [isSettling, setIsSettling] = useState<string | null>(null);
+  const [showSettlementModal, setShowSettlementModal] = useState(false);
+  const [settlementMarket, setSettlementMarket] = useState<Market | null>(null);
 
   // Rebate claim state
   const [isClaimingRebate, setIsClaimingRebate] = useState<string | null>(null);
@@ -1077,6 +1079,34 @@ export function Markets() {
 
                   <h4 className="market-question">{market.question}</h4>
 
+                  {/* WEEK 4 TASK 1: Market Lifecycle Progress Bar */}
+                  <div className="market-lifecycle-progress">
+                    <div className={`lifecycle-step ${market.status === 'open' || market.status === 'proposed' || market.status === 'challenged' || market.status === 'voting' || market.status === 'resolved' ? 'completed' : 'future'} ${market.status === 'open' ? 'current' : ''}`}>
+                      <div className="step-icon">{market.status === 'open' ? '⏳' : '✓'}</div>
+                      <div className="step-label">Open</div>
+                    </div>
+                    <div className="lifecycle-connector"></div>
+                    <div className={`lifecycle-step ${market.status === 'proposed' || market.status === 'challenged' || market.status === 'voting' || market.status === 'resolved' ? 'completed' : 'future'} ${market.status === 'proposed' ? 'current' : ''}`}>
+                      <div className="step-icon">{market.status === 'proposed' || (market.status === 'challenged' || market.status === 'voting' || market.status === 'resolved') ? '✓' : '💡'}</div>
+                      <div className="step-label">Proposed</div>
+                    </div>
+                    <div className="lifecycle-connector"></div>
+                    <div className={`lifecycle-step ${market.status === 'challenged' || market.status === 'voting' || market.status === 'resolved' ? 'completed' : 'future'} ${market.status === 'challenged' ? 'current' : ''}`}>
+                      <div className="step-icon">{market.status === 'challenged' || market.status === 'voting' || market.status === 'resolved' ? '✓' : '⚔️'}</div>
+                      <div className="step-label">Challenged</div>
+                    </div>
+                    <div className="lifecycle-connector"></div>
+                    <div className={`lifecycle-step ${market.status === 'voting' || market.status === 'resolved' ? 'completed' : 'future'} ${market.status === 'voting' ? 'current' : ''}`}>
+                      <div className="step-icon">{market.status === 'voting' || market.status === 'resolved' ? (market.status === 'resolved' ? '✓' : '🗳️') : '🗳️'}</div>
+                      <div className="step-label">Voting</div>
+                    </div>
+                    <div className="lifecycle-connector"></div>
+                    <div className={`lifecycle-step ${market.status === 'resolved' ? 'completed current' : 'future'}`}>
+                      <div className="step-icon">✅</div>
+                      <div className="step-label">Resolved</div>
+                    </div>
+                  </div>
+
                   {market.rules && (
                     <div className="market-rules">
                       <span className="rules-label">Rules:</span>
@@ -1161,7 +1191,10 @@ export function Markets() {
                       <div className={`countdown-box countdown-${countdowns[market.address]?.urgency || 'safe'}`}>
                         <div className="countdown-header">
                           <span className="countdown-icon">⏳</span>
-                          <span className="countdown-title">Proposals Open In</span>
+                          <span className="countdown-title detail-with-tooltip">
+                            Proposals Open In
+                            <span className="tooltip-text">There is a 5-minute delay after the resolution deadline before proposals are allowed. This prevents front-running.</span>
+                          </span>
                         </div>
                         <div className="countdown-timer">
                           <span className="countdown-value">{countdowns[market.address]?.proposalCountdown}</span>
@@ -1193,7 +1226,10 @@ export function Markets() {
 
                     {market.resolutionDeadline && market.resolutionDeadline > 0 && (
                       <div className="detail">
-                        <span className="label">Resolution Date</span>
+                        <span className="label detail-with-tooltip">
+                          Resolution Deadline
+                          <span className="tooltip-text">The event must resolve by this time. After this deadline passes, there is a 5-minute delay before proposals can be submitted.</span>
+                        </span>
                         <span className="value" title={`UTC: ${new Date(market.resolutionDeadline * 1000).toUTCString()}`}>
                           {formatTimestampInTimezone(market.resolutionDeadline, Intl.DateTimeFormat().resolvedOptions().timeZone)}
                         </span>
@@ -1219,7 +1255,10 @@ export function Markets() {
                           <div className={`countdown-box countdown-${countdowns[market.address]?.urgency || 'safe'}`}>
                             <div className="countdown-header">
                               <span className="countdown-icon">⏱️</span>
-                              <span className="countdown-title">Challenge Period</span>
+                              <span className="countdown-title detail-with-tooltip">
+                                Challenge Period
+                                <span className="tooltip-text">4 hours to challenge the current proposal. If no one challenges within this time, the market can be settled with the proposed outcome.</span>
+                              </span>
                             </div>
                             <div className="countdown-timer">
                               {countdowns[market.address]?.challengeCountdown === 'Challenge period ended' ? (
@@ -1268,7 +1307,10 @@ export function Markets() {
                         <div className={`countdown-box countdown-${countdowns[market.address]?.urgency || 'safe'}`}>
                           <div className="countdown-header">
                             <span className="countdown-icon">⚖️</span>
-                            <span className="countdown-title">DAO Veto Period</span>
+                            <span className="countdown-title detail-with-tooltip">
+                              DAO Veto Period
+                              <span className="tooltip-text">48-hour DAO voting period. Token holders with 2M+ HNCH staked for 24+ hours can vote to veto or support the proposed outcome.</span>
+                            </span>
                           </div>
                           <div className="countdown-timer">
                             {countdowns[market.address]?.vetoCountdown === 'Voting ended' ? (
@@ -1529,11 +1571,19 @@ export function Markets() {
                        market.challengeDeadline &&
                        Math.floor(Date.now() / 1000) >= market.challengeDeadline && (
                         <button
-                          className="btn-settle"
-                          onClick={() => handleSettle(market)}
+                          className="btn-settle btn-settle-badge"
+                          onClick={() => {
+                            setSettlementMarket(market);
+                            setShowSettlementModal(true);
+                          }}
                           disabled={isSettling === market.address}
                         >
-                          {isSettling === market.address ? 'Settling...' : 'Settle Market'}
+                          {isSettling === market.address ? 'Settling...' : (
+                            <>
+                              Settle Market
+                              <span className="settle-reward-chip">Earn 500 HNCH</span>
+                            </>
+                          )}
                         </button>
                       )}
 
@@ -1822,6 +1872,94 @@ export function Markets() {
           </div>
         </div>
       </div>
+
+      {/* WEEK 4 TASK 3: Settlement Explainer Modal */}
+      {showSettlementModal && settlementMarket && (
+        <div className="settlement-modal-overlay" onClick={() => setShowSettlementModal(false)}>
+          <div className="settlement-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="settlement-modal-header">
+              <span className="modal-icon">🎯</span>
+              <h3>Settle Market & Earn Reward</h3>
+            </div>
+            <div className="settlement-modal-body">
+              <div className="settlement-reward-badge">
+                You Will Earn
+                <span className="reward-amount">500 HNCH</span>
+              </div>
+
+              <div className="settlement-explainer">
+                <h4>What Settlement Does:</h4>
+                <ul className="settlement-explainer-list">
+                  <li>
+                    <span className="icon">🔒</span>
+                    <span className="text">
+                      <strong>Finalizes the market</strong> with the current proposed outcome
+                    </span>
+                  </li>
+                  <li>
+                    <span className="icon">💰</span>
+                    <span className="text">
+                      <strong>Bond winner receives</strong> their bond back + loser's bond + 2,000 HNCH bonus
+                    </span>
+                  </li>
+                  <li>
+                    <span className="icon">🎁</span>
+                    <span className="text">
+                      <strong>You receive 500 HNCH</strong> as a reward for settling this market
+                    </span>
+                  </li>
+                  <li>
+                    <span className="icon">👤</span>
+                    <span className="text">
+                      <strong>Market creator receives</strong> 2,500 HNCH rebate (25% of creation fee)
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="settlement-warning">
+                <span className="warning-icon">⚠️</span>
+                <span className="warning-text">
+                  This action is irreversible! Make sure the proposed outcome is correct.
+                </span>
+              </div>
+
+              <div className="settlement-explainer">
+                <h4>Current Proposed Outcome:</h4>
+                <ul className="settlement-explainer-list">
+                  <li>
+                    <span className="icon">{settlementMarket.proposedOutcome ? '✅' : '❌'}</span>
+                    <span className="text">
+                      <strong>{settlementMarket.proposedOutcome ? 'YES' : 'NO'}</strong>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="settlement-modal-actions">
+              <button
+                className="btn-settle-confirm"
+                onClick={async () => {
+                  setShowSettlementModal(false);
+                  await handleSettle(settlementMarket);
+                }}
+                disabled={isSettling === settlementMarket.address}
+              >
+                {isSettling === settlementMarket.address ? 'Settling...' : 'Confirm & Settle'}
+              </button>
+              <button
+                className="btn-cancel-modal"
+                onClick={() => {
+                  setShowSettlementModal(false);
+                  setSettlementMarket(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TASK 2: DAO Trigger Confirmation Modal */}
       {showDaoConfirmModal && daoConfirmMarket && (

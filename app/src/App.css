@@ -3687,3 +3687,443 @@ button:disabled {
     text-align: center;
   }
 }
+
+/* WEEK 4: Market Lifecycle Progress Bar */
+.market-lifecycle-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0 1.5rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.lifecycle-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  min-width: 60px;
+}
+
+.lifecycle-step .step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.lifecycle-step.completed .step-icon {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.lifecycle-step.current .step-icon {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.lifecycle-step.future .step-icon {
+  background: var(--surface);
+  border-color: var(--border);
+  opacity: 0.5;
+}
+
+.lifecycle-step .step-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 500;
+}
+
+.lifecycle-step.completed .step-label {
+  color: var(--secondary);
+}
+
+.lifecycle-step.current .step-label {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.lifecycle-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 0.5rem;
+  position: relative;
+  top: -10px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.1);
+  }
+}
+
+/* WEEK 4: Deadline Tooltips */
+.detail-with-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-trigger {
+  cursor: help;
+  border-bottom: 1px dotted var(--text-muted);
+}
+
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  z-index: 1000;
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  width: 280px;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s, visibility 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--surface-light) transparent transparent transparent;
+}
+
+.detail-with-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* WEEK 4: Settlement Explainer Modal */
+.settlement-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.settlement-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.settlement-modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settlement-modal-header .modal-icon {
+  font-size: 1.75rem;
+}
+
+.settlement-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.settlement-modal-body {
+  padding: 1.5rem;
+}
+
+.settlement-reward-badge {
+  background: linear-gradient(135deg, var(--secondary), #059669);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.settlement-reward-badge .reward-amount {
+  font-size: 1.5rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.settlement-explainer {
+  margin-bottom: 1.5rem;
+}
+
+.settlement-explainer h4 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.settlement-explainer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settlement-explainer-list li {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: var(--surface-light);
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.settlement-explainer-list li .icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.settlement-explainer-list li .text {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.settlement-warning {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.settlement-warning .warning-icon {
+  font-size: 1.25rem;
+  color: var(--danger);
+}
+
+.settlement-warning .warning-text {
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.settlement-modal-actions {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 1rem;
+}
+
+.settlement-modal-actions button {
+  flex: 1;
+}
+
+.btn-settle-confirm {
+  background: var(--secondary);
+}
+
+.btn-settle-confirm:hover:not(:disabled) {
+  background: #059669;
+}
+
+.btn-settle-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  position: relative;
+}
+
+.settle-reward-chip {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+/* WEEK 4: Mobile Responsiveness */
+@media (max-width: 768px) {
+  /* Lifecycle Progress Bar - Stack on mobile */
+  .market-lifecycle-progress {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .lifecycle-step {
+    min-width: 50px;
+  }
+
+  .lifecycle-step .step-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .lifecycle-step .step-label {
+    font-size: 0.7rem;
+  }
+
+  .lifecycle-connector {
+    flex: 1;
+    min-width: 20px;
+    margin: 0 0.25rem;
+  }
+
+  /* Settlement Modal */
+  .settlement-modal {
+    margin: 1rem;
+  }
+
+  .settlement-modal-header,
+  .settlement-modal-body,
+  .settlement-modal-actions {
+    padding: 1rem;
+  }
+
+  .settlement-modal-actions {
+    flex-direction: column;
+  }
+
+  .settlement-modal-actions button {
+    width: 100%;
+  }
+
+  /* Make all buttons full-width on mobile */
+  .market-actions button {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+
+  /* Stack bond escalation schedule */
+  .escalation-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Tooltip adjustments for mobile */
+  .tooltip-text {
+    width: 240px;
+    font-size: 0.8rem;
+  }
+
+  /* Ensure minimum touch target size */
+  button,
+  .filter-btn,
+  .btn-propose,
+  .btn-challenge,
+  .btn-settle {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+
+  /* Countdown boxes */
+  .countdown-box {
+    padding: 0.75rem;
+  }
+
+  .countdown-value {
+    font-size: 1.25rem;
+  }
+
+  /* Risk reward calculator */
+  .risk-reward-calculator {
+    font-size: 0.9rem;
+  }
+
+  /* Bond history timeline */
+  .bond-history-timeline {
+    padding-left: 0.5rem;
+  }
+
+  .timeline-content {
+    padding: 0.75rem;
+  }
+
+  /* DAO warning cards */
+  .dao-trigger-warning {
+    padding: 1rem;
+  }
+
+  .dao-requirements {
+    flex-direction: column;
+  }
+
+  /* Voting eligibility */
+  .voting-eligibility-card {
+    padding: 1rem;
+  }
+
+  /* Vote impact prediction */
+  .vote-impact-prediction {
+    font-size: 0.9rem;
+  }
+
+  /* Market details - ensure text is readable */
+  .market-question {
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  .detail {
+    font-size: 0.9rem;
+  }
+
+  /* Filter buttons - allow wrapping */
+  .filter-buttons {
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
