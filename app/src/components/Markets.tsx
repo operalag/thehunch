@@ -7,7 +7,6 @@ import { useMarkets, type Market, type MarketCategory } from '../hooks/useMarket
 import { useStakingInfo } from '../hooks/useStakingInfo';
 import { useMarketParticipants } from '../hooks/useMarketParticipants';
 import { getExplorerLink } from '../config/contracts';
-import { updateMarketInCache } from '../config/supabase';
 
 // Filter types
 type StatusFilter = 'all' | 'open' | 'waiting' | 'proposed' | 'challenged' | 'voting' | 'resolved';
@@ -580,20 +579,13 @@ export function Markets() {
     try {
       await proposeOutcome(market.address, proposeAnswer, bondAmount);
 
-      // Update cache to reflect proposed status (optimistic update)
-      await updateMarketInCache(market.id, {
-        status: 'proposed',
-        proposed_outcome: proposeAnswer,
-        current_bond: bondAmount * 1e9, // Convert to nano
-        proposed_at: Math.floor(Date.now() / 1000),
-        challenge_deadline: Math.floor(Date.now() / 1000) + 86400, // 24h challenge window
-      });
-
-      // Refetch markets to update UI
-      await refetchMarkets();
+      // Wait for transaction to be processed on blockchain, then update status
+      // TON typically confirms in 5-10 seconds
+      await new Promise(resolve => setTimeout(resolve, 8000));
+      await updateMarketStatus(market.address);
 
       setProposeMarketId(null);
-      alert('Proposal transaction sent! Your outcome will be recorded after blockchain confirmation.');
+      alert('Proposal submitted successfully! The market now shows your proposed outcome.');
     } catch (error: any) {
       console.error('Failed to propose:', error);
       alert(error.message || 'Failed to propose outcome. Please try again.');
@@ -642,22 +634,15 @@ export function Markets() {
       const oppositeAnswer = !market.proposedOutcome;
       await challengeOutcome(market.address, oppositeAnswer, bondAmount);
 
-      // Update cache to reflect challenged status (optimistic update)
-      await updateMarketInCache(market.id, {
-        status: 'challenged',
-        current_bond: bondAmount * 1e9, // Convert to nano
-        escalation_count: (market.escalationCount || 0) + 1,
-        proposed_outcome: oppositeAnswer,
-        challenge_deadline: Math.floor(Date.now() / 1000) + 86400, // Reset 24h window
-      });
-
-      // Refetch markets to update UI
-      await refetchMarkets();
+      // Wait for transaction to be processed on blockchain, then update status
+      // TON typically confirms in 5-10 seconds
+      await new Promise(resolve => setTimeout(resolve, 8000));
+      await updateMarketStatus(market.address);
 
       setChallengeMarketId(null);
       setShowDaoConfirmModal(false);
       setDaoConfirmMarket(null);
-      alert('Challenge transaction sent! Your challenge will be recorded after blockchain confirmation.');
+      alert('Challenge submitted successfully! The market now shows the updated bond and deadline.');
     } catch (error: any) {
       console.error('Failed to challenge:', error);
       alert(error.message || 'Failed to challenge. Please try again.');
