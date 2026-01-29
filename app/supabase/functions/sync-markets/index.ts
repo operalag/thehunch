@@ -471,6 +471,104 @@ async function parseParticipants(
   }
 }
 
+// Update market status from blockchain state
+async function updateMarketStatus(
+  network: 'mainnet' | 'testnet',
+  marketAddress: string,
+  supabase: any
+): Promise<{ success: boolean; updated?: any; error?: string }> {
+  try {
+    console.log(`[updateMarketStatus] Fetching state for ${marketAddress}`);
+
+    // Get instance state from blockchain
+    const stateResult = await callGetMethod(network, marketAddress, 'get_instance_state');
+
+    if (!stateResult.success || !stateResult.stack) {
+      return { success: false, error: 'Failed to get instance state from blockchain' };
+    }
+
+    // Stack: (instance_id, state, escalation_count, total_bonds, resolution_method, resolution_deadline)
+    const state = parseInt(stateResult.stack[1]?.num || '0', 16);
+    const escalationCount = parseInt(stateResult.stack[2]?.num || '0', 16);
+    const totalBonds = parseInt(stateResult.stack[3]?.num || '0', 16);
+    const resolutionMethod = parseInt(stateResult.stack[4]?.num || '0', 16);
+
+    console.log(`[updateMarketStatus] Chain state: state=${state}, escalation=${escalationCount}, bonds=${totalBonds}, method=${resolutionMethod}`);
+
+    // Map contract state to status string
+    // STATE_OPEN=0, STATE_PROPOSED=1, STATE_CHALLENGED=2, STATE_VOTING=3, STATE_RESOLVED=4
+    const stateMap: Record<number, string> = {
+      0: 'open',
+      1: 'proposed',
+      2: 'challenged',
+      3: 'voting',
+      4: 'resolved',
+    };
+    const status = stateMap[state] || 'open';
+
+    // Build update object
+    const updateData: Record<string, any> = {
+      status,
+      escalation_count: escalationCount,
+      current_bond: totalBonds / 1e9, // Convert from nano to HNCH
+      updated_at: new Date().toISOString(),
+    };
+
+    // If resolved, set the current_answer based on proposed_outcome (no challenges = proposal wins)
+    if (state === 4) {
+      // Get the market's proposed_outcome from DB
+      const { data: marketData } = await supabase
+        .from('markets')
+        .select('proposed_outcome')
+        .eq('address', marketAddress)
+        .single();
+
+      if (marketData) {
+        // The final answer is the proposed outcome (since it resolved without DAO vote in this case)
+        updateData.current_answer = marketData.proposed_outcome;
+        console.log(`[updateMarketStatus] Set current_answer to ${marketData.proposed_outcome} (from proposed_outcome)`);
+      }
+
+      // Try to find who settled the market (resolver)
+      const txData = await fetchTransactions(network, marketAddress, undefined, 50);
+      if (txData.transactions) {
+        for (const tx of txData.transactions) {
+          if (tx.in_msg?.op_code === '0x00000013' && tx.success) {
+            // Found successful settle transaction
+            const resolverRaw = tx.in_msg.source?.address;
+            if (resolverRaw) {
+              const resolverFriendly = rawToFriendly(resolverRaw, network === 'testnet');
+              updateData.resolver_address = resolverFriendly;
+              updateData.resolver_reward = 500; // 500 HNCH for resolving
+              console.log(`[updateMarketStatus] Resolver: ${resolverFriendly}`);
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    // Update the market in database
+    const { data, error } = await supabase
+      .from('markets')
+      .update(updateData)
+      .eq('address', marketAddress)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`[updateMarketStatus] Update error:`, error);
+      return { success: false, error: error.message };
+    }
+
+    console.log(`[updateMarketStatus] Successfully updated market to status=${status}`);
+    return { success: true, updated: data };
+  } catch (error: any) {
+    console.error(`[updateMarketStatus] Error:`, error);
+    return { success: false, error: error.message };
+  }
+}
+
 // Parse market data from instance contract
 async function parseMarketData(
   network: 'mainnet' | 'testnet',
@@ -780,6 +878,19 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ success: true, mode: 'backfill_participants', results }),
         { status: 200, headers }
+      );
+    }
+
+    // Update market status from blockchain
+    const updateStatus = body.update_status || false;
+    const marketAddress = body.market_address;
+
+    if (updateStatus && marketAddress) {
+      console.log(`[sync-markets] Updating status for market ${marketAddress}`);
+      const updateResult = await updateMarketStatus(network === 'both' ? 'mainnet' : network, marketAddress, supabase);
+      return new Response(
+        JSON.stringify({ success: updateResult.success, mode: 'update_status', ...updateResult }),
+        { status: updateResult.success ? 200 : 500, headers }
       );
     }
 
