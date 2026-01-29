@@ -2663,3 +2663,590 @@ button:disabled {
     display: none;
   }
 }
+
+/* ===== Week 2 DAO Voting Experience Styles ===== */
+
+/* TASK 1: DAO Trigger Warning Banner */
+.dao-trigger-warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.1));
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  animation: pulse-border-warning 2s ease-in-out infinite;
+}
+
+.dao-trigger-warning .warning-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.dao-trigger-warning .warning-icon-large {
+  font-size: 2rem;
+}
+
+.dao-trigger-warning h5 {
+  color: var(--warning);
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.dao-trigger-warning .warning-description {
+  color: var(--text);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.dao-trigger-warning .dao-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dao-trigger-warning .requirement-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.dao-trigger-warning .req-icon {
+  font-size: 1.1rem;
+}
+
+/* TASK 2: DAO Confirmation Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dao-confirm-modal {
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dao-confirm-modal .modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.dao-confirm-modal .modal-icon {
+  font-size: 2.5rem;
+}
+
+.dao-confirm-modal .modal-header h3 {
+  color: var(--text);
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.dao-confirm-modal .modal-body {
+  margin-bottom: 1.5rem;
+}
+
+.dao-confirm-modal .modal-warning {
+  color: var(--text);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.dao-confirm-modal .modal-warning strong {
+  color: var(--warning);
+}
+
+.dao-confirm-modal .modal-info-box {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dao-confirm-modal .modal-info-box h4 {
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.dao-confirm-modal .modal-info-box ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--text);
+}
+
+.dao-confirm-modal .modal-info-box li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.dao-confirm-modal .modal-challenge-details {
+  background: var(--surface-light);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.dao-confirm-modal .modal-challenge-details p {
+  margin: 0.5rem 0;
+  color: var(--text);
+}
+
+.dao-confirm-modal .modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-confirm-dao {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--warning), #d97706);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-dao:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.btn-confirm-dao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancel-modal {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: var(--surface-light);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-modal:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+/* TASK 3: Enhanced Voting Eligibility Display */
+.voting-eligibility-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+}
+
+.voting-eligibility-card .eligibility-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.voting-eligibility-card .eligibility-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.voting-eligibility-card .requirement-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.voting-eligibility-card .requirement-row.met {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.voting-eligibility-card .requirement-row.unmet {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.voting-eligibility-card .req-check {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.voting-eligibility-card .req-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.voting-eligibility-card .req-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.voting-eligibility-card .req-value {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.voting-eligibility-card .go-to-staking-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.voting-eligibility-card .go-to-staking-link:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* TASK 4: Vote Impact Prediction */
+.vote-impact-prediction {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.05));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+}
+
+.vote-impact-prediction .impact-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.vote-impact-prediction .impact-icon {
+  font-size: 1.25rem;
+}
+
+.vote-impact-prediction .impact-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vote-impact-prediction .impact-current,
+.vote-impact-prediction .impact-prediction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.vote-impact-prediction .impact-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.vote-impact-prediction .impact-value {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.vote-impact-prediction .impact-result {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.vote-impact-prediction .impact-result.flip {
+  color: var(--warning);
+}
+
+.vote-impact-prediction .impact-result.stand {
+  color: var(--success);
+}
+
+.vote-impact-prediction .impact-if-you-vote {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vote-impact-prediction .if-veto,
+.vote-impact-prediction .if-support {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.vote-impact-prediction .if-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.vote-impact-prediction .if-result {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.vote-impact-prediction .if-result.flip {
+  color: var(--danger);
+}
+
+.vote-impact-prediction .if-result.stand {
+  color: var(--secondary);
+}
+
+/* TASK 5: Already Voted Indicator */
+.already-voted-badge {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(34, 197, 94, 0.1));
+  border: 2px solid rgba(16, 185, 129, 0.5);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.already-voted-badge .voted-icon {
+  font-size: 2.5rem;
+  color: var(--success);
+}
+
+.already-voted-badge .voted-text {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.already-voted-badge .voted-text strong {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.already-voted-badge .voted-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Helper text colors */
+.text-warning {
+  color: var(--warning) !important;
+}
+
+.text-success {
+  color: var(--success) !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dao-confirm-modal {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .dao-trigger-warning {
+    padding: 1rem;
+  }
+
+  .voting-eligibility-card,
+  .vote-impact-prediction {
+    padding: 0.85rem;
+  }
+
+  .dao-confirm-modal .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .dao-confirm-modal .modal-icon {
+    font-size: 2rem;
+  }
+}
+
+/* ===== Sync Markets UI Styles ===== */
+
+.markets-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sync-info-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.sync-info-tooltip .info-icon {
+  font-size: 1rem;
+  cursor: help;
+}
+
+.sync-info-tooltip .info-text {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.btn-sync {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-sync:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-sync:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-notification {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sync-notification.sync-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--secondary);
+}
+
+.sync-notification.sync-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+}
+
+.sync-notification-icon {
+  font-size: 1.25rem;
+}
+
+.sync-notification-text {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .markets-header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .sync-info-tooltip {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-sync,
+  .btn-refresh {
+    width: 100%;
+  }
+
+  .sync-notification {
+    flex-direction: column;
+    text-align: center;
+  }
+}

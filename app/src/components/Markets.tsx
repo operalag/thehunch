@@ -122,6 +122,21 @@ export function Markets() {
   const [isVetoing, setIsVetoing] = useState(false);
   const [isCounterVetoing, setIsCounterVetoing] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
+
+  // DAO Challenge Confirmation Modal state
+  const [showDaoConfirmModal, setShowDaoConfirmModal] = useState(false);
+  const [daoConfirmMarket, setDaoConfirmMarket] = useState<Market | null>(null);
+
+  // Track user votes in localStorage
+  const getUserVote = (marketAddress: string): 'veto' | 'support' | null => {
+    const voteKey = `vote_${marketAddress}_${userAddress}`;
+    return localStorage.getItem(voteKey) as 'veto' | 'support' | null;
+  };
+
+  const setUserVote = (marketAddress: string, voteType: 'veto' | 'support') => {
+    const voteKey = `vote_${marketAddress}_${userAddress}`;
+    localStorage.setItem(voteKey, voteType);
+  };
   // Settle state
   const [isSettling, setIsSettling] = useState<string | null>(null);
 
@@ -432,6 +447,22 @@ export function Markets() {
       return;
     }
 
+    // TASK 2: Show confirmation modal if this is the 3rd challenge (triggers DAO vote)
+    if ((market.escalationCount || 0) === 2) {
+      setDaoConfirmMarket(market);
+      setShowDaoConfirmModal(true);
+      return;
+    }
+
+    await executeChallengeTransaction(market);
+  };
+
+  const executeChallengeTransaction = async (market: Market) => {
+    if (!market.address || market.currentBond === undefined) {
+      alert('Market data not available');
+      return;
+    }
+
     const requiredBond = market.currentBond * 2;
     const bondAmount = parseFloat(challengeBond);
 
@@ -463,6 +494,8 @@ export function Markets() {
       await refetchMarkets();
 
       setChallengeMarketId(null);
+      setShowDaoConfirmModal(false);
+      setDaoConfirmMarket(null);
       alert('Challenge transaction sent! Your challenge will be recorded after blockchain confirmation.');
     } catch (error: any) {
       console.error('Failed to challenge:', error);
@@ -488,6 +521,12 @@ export function Markets() {
       const stakeAmount = BigInt(stakingInfo.userStake);
       const lockTime = stakingInfo.lockTime || 0;
       await castVeto(market.vetoGuardAddress, stakeAmount, lockTime);
+
+      // TASK 5: Track user vote
+      if (market.address) {
+        setUserVote(market.address, 'veto');
+      }
+
       alert('Veto transaction sent! Your veto will be recorded after blockchain confirmation.');
       refetchMarkets();
     } catch (error: any) {
@@ -514,6 +553,12 @@ export function Markets() {
       const stakeAmount = BigInt(stakingInfo.userStake);
       const lockTime = stakingInfo.lockTime || 0;
       await counterVeto(market.vetoGuardAddress, stakeAmount, lockTime);
+
+      // TASK 5: Track user vote
+      if (market.address) {
+        setUserVote(market.address, 'support');
+      }
+
       alert('Counter-veto transaction sent! Your counter-veto will be recorded after blockchain confirmation.');
       refetchMarkets();
     } catch (error: any) {
@@ -1011,6 +1056,34 @@ export function Markets() {
                     </div>
                   )}
 
+                  {/* TASK 1: DAO Trigger Warning for 2nd Challenge */}
+                  {(market.status === 'proposed' || market.status === 'challenged') &&
+                   (market.escalationCount || 0) === 2 && (
+                    <div className="dao-trigger-warning">
+                      <div className="warning-header">
+                        <span className="warning-icon-large">⚠️</span>
+                        <h5>One More Challenge Will Trigger DAO Vote!</h5>
+                      </div>
+                      <p className="warning-description">
+                        After the next challenge, this market will enter a 48-hour DAO voting period.
+                      </p>
+                      <div className="dao-requirements">
+                        <div className="requirement-item">
+                          <span className="req-icon">🔒</span>
+                          <span className="req-text">Requires 2,000,000+ HNCH staked</span>
+                        </div>
+                        <div className="requirement-item">
+                          <span className="req-icon">⏱️</span>
+                          <span className="req-text">Staked for 24+ hours to participate</span>
+                        </div>
+                        <div className="requirement-item">
+                          <span className="req-icon">⚖️</span>
+                          <span className="req-text">Community votes to resolve dispute</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="market-details">
                     {/* Countdown box for open markets waiting for proposals */}
                     {market.status === 'open' && !market.canProposeNow && countdowns[market.address]?.proposalCountdown && (
@@ -1146,6 +1219,44 @@ export function Markets() {
                           )}
                         </div>
 
+                        {/* TASK 3: Enhanced Voting Eligibility Display */}
+                        <div className="voting-eligibility-card">
+                          <h5 className="eligibility-title">Voting Eligibility</h5>
+                          <div className="eligibility-requirements">
+                            <div className={`requirement-row ${(Number(stakingInfo.userStake || 0) / 1e9) >= VETO_THRESHOLD_HNCH ? 'met' : 'unmet'}`}>
+                              <span className="req-check">
+                                {(Number(stakingInfo.userStake || 0) / 1e9) >= VETO_THRESHOLD_HNCH ? '✅' : '❌'}
+                              </span>
+                              <div className="req-content">
+                                <span className="req-label">Stake Amount</span>
+                                <span className="req-value">
+                                  {stakingInfo.formattedUserStake} / {VETO_THRESHOLD_HNCH.toLocaleString()} HNCH
+                                </span>
+                              </div>
+                            </div>
+                            <div className={`requirement-row ${stakingInfo.lockTime > 0 && Math.floor(Date.now() / 1000) >= stakingInfo.lockTime + VETO_LOCK_PERIOD ? 'met' : 'unmet'}`}>
+                              <span className="req-check">
+                                {stakingInfo.lockTime > 0 && Math.floor(Date.now() / 1000) >= stakingInfo.lockTime + VETO_LOCK_PERIOD ? '✅' : '❌'}
+                              </span>
+                              <div className="req-content">
+                                <span className="req-label">Lock Duration</span>
+                                <span className="req-value">
+                                  {stakingInfo.lockTime > 0
+                                    ? Math.floor(Date.now() / 1000) >= stakingInfo.lockTime + VETO_LOCK_PERIOD
+                                      ? '24+ hours ✓'
+                                      : `${Math.floor((stakingInfo.lockTime + VETO_LOCK_PERIOD - Math.floor(Date.now() / 1000)) / 3600)}h remaining`
+                                    : 'Not staked'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {!canUserVeto() && (
+                            <a href="#stake" className="go-to-staking-link">
+                              Go to Staking →
+                            </a>
+                          )}
+                        </div>
+
                         <div className="detail">
                           <span className="label">Current Answer</span>
                           <span className={`value outcome-${market.currentAnswer ? 'yes' : 'no'}`}>
@@ -1163,13 +1274,47 @@ export function Markets() {
                             <span className="vote-label">Support</span>
                           </div>
                         </div>
-                        <div className="detail">
-                          <span className="label">Net Effect</span>
-                          <span className={`value ${((market.vetoCount || 0) - (market.supportCount || 0)) > 0 ? 'text-warning' : 'text-success'}`}>
-                            {((market.vetoCount || 0) - (market.supportCount || 0)) > 0
-                              ? `Answer will flip to ${market.currentAnswer ? 'NO' : 'YES'}`
-                              : 'Current answer stands'}
-                          </span>
+
+                        {/* TASK 4: Vote Impact Prediction */}
+                        <div className="vote-impact-prediction">
+                          <div className="impact-header">
+                            <span className="impact-icon">📊</span>
+                            <span className="impact-title">Vote Impact</span>
+                          </div>
+                          <div className="impact-current">
+                            <span className="impact-label">Current Tally:</span>
+                            <span className="impact-value">
+                              {market.vetoCount || 0} vetoes vs {market.supportCount || 0} supports
+                            </span>
+                          </div>
+                          <div className="impact-prediction">
+                            <span className="impact-label">Net Effect:</span>
+                            <span className={`impact-result ${((market.vetoCount || 0) - (market.supportCount || 0)) > 0 ? 'flip' : 'stand'}`}>
+                              {((market.vetoCount || 0) - (market.supportCount || 0)) > 0
+                                ? `Answer will flip to ${market.currentAnswer ? 'NO' : 'YES'}`
+                                : 'Current answer stands'}
+                            </span>
+                          </div>
+                          {canUserVeto() && (
+                            <div className="impact-if-you-vote">
+                              <div className="if-veto">
+                                <span className="if-label">If you veto:</span>
+                                <span className={`if-result ${((market.vetoCount || 0) + 1 - (market.supportCount || 0)) > 0 ? 'flip' : 'stand'}`}>
+                                  {((market.vetoCount || 0) + 1 - (market.supportCount || 0)) > 0
+                                    ? `Answer will flip to ${market.currentAnswer ? 'NO' : 'YES'}`
+                                    : 'Current answer stands'}
+                                </span>
+                              </div>
+                              <div className="if-support">
+                                <span className="if-label">If you support:</span>
+                                <span className={`if-result ${((market.vetoCount || 0) - ((market.supportCount || 0) + 1)) > 0 ? 'flip' : 'stand'}`}>
+                                  {((market.vetoCount || 0) - ((market.supportCount || 0) + 1)) > 0
+                                    ? `Answer will flip to ${market.currentAnswer ? 'NO' : 'YES'}`
+                                    : 'Current answer stands'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </>
                     )}
@@ -1262,33 +1407,46 @@ export function Markets() {
                         <div className="veto-actions">
                           {market.vetoEnd && Math.floor(Date.now() / 1000) < market.vetoEnd ? (
                             <>
-                              <div className="veto-eligibility">
-                                {canUserVeto() ? (
-                                  <span className="eligible">You are eligible to veto/counter-veto</span>
-                                ) : (
-                                  <span className="not-eligible">
-                                    Requires {VETO_THRESHOLD_HNCH.toLocaleString()} HNCH staked for 24h+
+                              {/* TASK 5: Already Voted Indicator */}
+                              {market.address && getUserVote(market.address) ? (
+                                <div className="already-voted-badge">
+                                  <span className="voted-icon">✓</span>
+                                  <span className="voted-text">
+                                    You voted: <strong>{getUserVote(market.address) === 'veto' ? 'VETO' : 'SUPPORT'}</strong>
                                   </span>
-                                )}
-                              </div>
-                              <div className="veto-buttons">
-                                <button
-                                  className="btn-veto"
-                                  onClick={() => handleCastVeto(market)}
-                                  disabled={isVetoing || !canUserVeto()}
-                                  title={`Veto: flip answer to ${market.currentAnswer ? 'NO' : 'YES'}`}
-                                >
-                                  {isVetoing ? 'Vetoing...' : `Veto (flip to ${market.currentAnswer ? 'NO' : 'YES'})`}
-                                </button>
-                                <button
-                                  className="btn-counter-veto"
-                                  onClick={() => handleCounterVeto(market)}
-                                  disabled={isCounterVetoing || !canUserVeto()}
-                                  title={`Support: keep answer as ${market.currentAnswer ? 'YES' : 'NO'}`}
-                                >
-                                  {isCounterVetoing ? 'Counter-vetoing...' : `Support (keep ${market.currentAnswer ? 'YES' : 'NO'})`}
-                                </button>
-                              </div>
+                                  <span className="voted-hint">You cannot vote again in this market</span>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="veto-eligibility">
+                                    {canUserVeto() ? (
+                                      <span className="eligible">You are eligible to veto/counter-veto</span>
+                                    ) : (
+                                      <span className="not-eligible">
+                                        Requires {VETO_THRESHOLD_HNCH.toLocaleString()} HNCH staked for 24h+
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="veto-buttons">
+                                    <button
+                                      className="btn-veto"
+                                      onClick={() => handleCastVeto(market)}
+                                      disabled={isVetoing || !canUserVeto() || (market.address ? !!getUserVote(market.address) : false)}
+                                      title={`Veto: flip answer to ${market.currentAnswer ? 'NO' : 'YES'}`}
+                                    >
+                                      {isVetoing ? 'Vetoing...' : `Veto (flip to ${market.currentAnswer ? 'NO' : 'YES'})`}
+                                    </button>
+                                    <button
+                                      className="btn-counter-veto"
+                                      onClick={() => handleCounterVeto(market)}
+                                      disabled={isCounterVetoing || !canUserVeto() || (market.address ? !!getUserVote(market.address) : false)}
+                                      title={`Support: keep answer as ${market.currentAnswer ? 'YES' : 'NO'}`}
+                                    >
+                                      {isCounterVetoing ? 'Counter-vetoing...' : `Support (keep ${market.currentAnswer ? 'YES' : 'NO'})`}
+                                    </button>
+                                  </div>
+                                </>
+                              )}
                             </>
                           ) : (
                             <button
@@ -1490,6 +1648,58 @@ export function Markets() {
           </div>
         </div>
       </div>
+
+      {/* TASK 2: DAO Trigger Confirmation Modal */}
+      {showDaoConfirmModal && daoConfirmMarket && (
+        <div className="modal-overlay" onClick={() => setShowDaoConfirmModal(false)}>
+          <div className="dao-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-icon">⚖️</span>
+              <h3>This Will Trigger a DAO Vote!</h3>
+            </div>
+            <div className="modal-body">
+              <p className="modal-warning">
+                After your challenge, this market will enter a <strong>48-hour DAO voting period</strong>.
+              </p>
+              <div className="modal-info-box">
+                <h4>What happens next:</h4>
+                <ul>
+                  <li>Market enters DAO voting for 48 hours</li>
+                  <li>Only users with 2M+ HNCH staked for 24h+ can vote</li>
+                  <li>Community votes to resolve the dispute</li>
+                  <li>After 48 hours, anyone can finalize the vote</li>
+                </ul>
+              </div>
+              <div className="modal-challenge-details">
+                <p><strong>Your Challenge:</strong></p>
+                <p>Proposing: <span className={`outcome-${!daoConfirmMarket.proposedOutcome ? 'yes' : 'no'}`}>
+                  {!daoConfirmMarket.proposedOutcome ? 'YES' : 'NO'}
+                </span></p>
+                <p>Bond Required: <strong>{((daoConfirmMarket.currentBond || 0) * 2).toLocaleString()} HNCH</strong></p>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button
+                className="btn-confirm-dao"
+                onClick={() => executeChallengeTransaction(daoConfirmMarket)}
+                disabled={isChallenging}
+              >
+                {isChallenging ? 'Submitting...' : 'Confirm & Trigger DAO Vote'}
+              </button>
+              <button
+                className="btn-cancel-modal"
+                onClick={() => {
+                  setShowDaoConfirmModal(false);
+                  setDaoConfirmMarket(null);
+                  setChallengeMarketId(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
