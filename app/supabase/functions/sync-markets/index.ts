@@ -261,6 +261,7 @@ async function parseParticipants(
 
     const participants: any[] = [];
     let escalationLevel = 0;
+    let hasProposal = false;
 
     console.log(`[parseParticipants] Processing ${txData.transactions.length} transactions...`);
 
@@ -268,53 +269,115 @@ async function parseParticipants(
     for (const tx of txData.transactions.reverse()) {
       // Look for incoming messages
       if (!tx.in_msg || !tx.in_msg.source) {
-        console.log(`[parseParticipants] Skipping tx: no in_msg or source`);
+        console.log(`[parseParticipants] Skipping tx ${tx.hash?.substring(0, 8)}: no in_msg or source`);
         continue;
       }
 
-      const opCode = tx.in_msg.op_code;
+      const opCode = tx.in_msg.op_code?.toLowerCase();
       const rawBody = tx.in_msg.raw_body || '';
+      const txHash = tx.hash || '';
 
-      console.log(`[parseParticipants] tx op_code=${opCode}, rawBody length=${rawBody.length}`);
+      console.log(`[parseParticipants] tx ${txHash.substring(0, 8)} op_code=${opCode}, rawBody length=${rawBody.length}`);
 
       // Skip if not a Jetton transfer notification (0x7362d09c)
-      // Also handle different case formats
-      if (opCode !== '0x7362d09c' && opCode !== '0x7362D09C') {
+      if (opCode !== '0x7362d09c') {
         console.log(`[parseParticipants] Skipping: not a Jetton transfer (${opCode})`);
+        continue;
+      }
+
+      // Check if this tx was already processed (by tx_hash)
+      const { data: existingTx } = await supabase
+        .from('market_participants')
+        .select('id')
+        .eq('tx_hash', txHash)
+        .maybeSingle();
+
+      if (existingTx) {
+        console.log(`[parseParticipants] tx ${txHash.substring(0, 8)} already processed, skipping`);
+        // But we still need to count it for escalation level
+        const { data: existingRecord } = await supabase
+          .from('market_participants')
+          .select('action')
+          .eq('tx_hash', txHash)
+          .single();
+        if (existingRecord?.action === 'propose') hasProposal = true;
+        if (existingRecord?.action === 'challenge') escalationLevel++;
         continue;
       }
 
       console.log(`[parseParticipants] Found Jetton transfer, checking for propose/challenge...`);
 
       try {
-        // Look for propose (00000010) or challenge (00000011) in the raw_body
-        // The forward_payload contains the actual operation
+        // Try to use decoded_body first (cleaner), fall back to raw_body parsing
         let action: 'propose' | 'challenge' | null = null;
         let answer = false;
+        let senderAddress = tx.in_msg.source.address; // Fallback to Jetton wallet
 
-        // Search for propose op in hex string
-        const proposeIndex = rawBody.indexOf('00000010');
-        const challengeIndex = rawBody.indexOf('00000011');
+        const decodedBody = tx.in_msg.decoded_body;
 
-        console.log(`[parseParticipants] proposeIndex=${proposeIndex}, challengeIndex=${challengeIndex}`);
+        if (decodedBody && decodedBody.forward_payload) {
+          // Use decoded body - much cleaner!
+          const forwardPayload = decodedBody.forward_payload;
+          const opCode = forwardPayload.value?.op_code;
 
-        if (proposeIndex !== -1) {
-          action = 'propose';
-          // Answer is after op (8 chars) + query_id (16 chars)
-          const answerOffset = proposeIndex + 8 + 16;
-          if (answerOffset + 2 <= rawBody.length) {
-            const answerHex = rawBody.substring(answerOffset, answerOffset + 2);
-            console.log(`[parseParticipants] answerHex=${answerHex}`);
-            // In FunC: -1 = true (0xff), 0 = false (0x00)
-            answer = answerHex === 'ff' || answerHex === 'FF';
+          console.log(`[parseParticipants] Using decoded_body, forward_payload op_code=${opCode}`);
+
+          if (opCode === 16 || opCode === 0x10) {
+            action = 'propose';
+          } else if (opCode === 17 || opCode === 0x11) {
+            action = 'challenge';
           }
-        } else if (challengeIndex !== -1) {
-          action = 'challenge';
-          const answerOffset = challengeIndex + 8 + 16;
-          if (answerOffset + 2 <= rawBody.length) {
-            const answerHex = rawBody.substring(answerOffset, answerOffset + 2);
-            console.log(`[parseParticipants] answerHex=${answerHex}`);
-            answer = answerHex === 'ff' || answerHex === 'FF';
+
+          // Extract sender from decoded_body
+          if (decodedBody.sender) {
+            senderAddress = decodedBody.sender;
+            console.log(`[parseParticipants] Sender from decoded_body: ${senderAddress}`);
+          }
+
+          // Parse answer from forward_payload cell
+          // The cell contains: op(4) + query_id(8) + answer(1 bit)
+          // In decoded form, we need to check the raw cell value
+          if (action && forwardPayload.value?.value) {
+            const cellHex = forwardPayload.value.value.toLowerCase();
+            // Look for the answer bit after the BOC header
+            // Cell format: b5ee9c72... header, then op(8 hex) + query_id(16 hex) + answer byte
+            const opIndex = cellHex.indexOf('00000010') !== -1 ? cellHex.indexOf('00000010') :
+                            cellHex.indexOf('00000011') !== -1 ? cellHex.indexOf('00000011') : -1;
+            if (opIndex !== -1) {
+              const answerOffset = opIndex + 8 + 16;
+              if (answerOffset + 2 <= cellHex.length) {
+                const answerByte = parseInt(cellHex.substring(answerOffset, answerOffset + 2), 16);
+                answer = (answerByte & 0x80) !== 0;
+                console.log(`[parseParticipants] Answer from forward_payload: ${answer}`);
+              }
+            }
+          }
+        }
+
+        // Fall back to raw_body parsing if decoded_body didn't work
+        if (!action) {
+          console.log(`[parseParticipants] Falling back to raw_body parsing...`);
+
+          // Search for propose op in hex string (32-bit op code as hex)
+          const proposeIndex = rawBody.toLowerCase().indexOf('00000010');
+          const challengeIndex = rawBody.toLowerCase().indexOf('00000011');
+
+          console.log(`[parseParticipants] proposeIndex=${proposeIndex}, challengeIndex=${challengeIndex}`);
+
+          if (proposeIndex !== -1) {
+            action = 'propose';
+            const answerOffset = proposeIndex + 8 + 16;
+            if (answerOffset + 2 <= rawBody.length) {
+              const answerByte = parseInt(rawBody.substring(answerOffset, answerOffset + 2), 16);
+              answer = (answerByte & 0x80) !== 0;
+            }
+          } else if (challengeIndex !== -1) {
+            action = 'challenge';
+            const answerOffset = challengeIndex + 8 + 16;
+            if (answerOffset + 2 <= rawBody.length) {
+              const answerByte = parseInt(rawBody.substring(answerOffset, answerOffset + 2), 16);
+              answer = (answerByte & 0x80) !== 0;
+            }
           }
         }
 
@@ -323,81 +386,29 @@ async function parseParticipants(
           continue;
         }
 
-        console.log(`[parseParticipants] Found action=${action}, answer=${answer}`);
-
-        // Extract sender from the raw_body of the Jetton transfer_notification
-        // Format: op(4) + query_id(8) + jetton_amount(var) + sender_address + forward_payload
-        // The sender address is encoded after the jetton amount (which is variable length)
-        //
-        // For now, we'll extract the sender from the raw_body by looking for the address pattern
-        // A TON address is 267 bits = 34 bytes when serialized
-        // After BOC header and cell refs, the data contains the sender address
-
-        // Simpler approach: The source of the Jetton transfer is the Jetton wallet
-        // We can extract the original sender from within the message body
-        // The raw_body contains the sender address after query_id and amount
-
-        // Looking at the hex: after 7362d09c (op) + 8 bytes query_id + variable coins
-        // For jetton transfers, the sender is typically in the body
-        // Let's extract from position after the op code area
-
-        let senderAddress = tx.in_msg.source.address; // Default to Jetton wallet address
-
-        // Try to extract original sender from raw_body
-        // The format has sender address after: op(8 hex) + query_id(16 hex) + amount(varies)
-        // Look for address-like pattern (starts with 0: or 8 followed by workchain)
-        // Actually, in the transfer_notification, the sender is encoded in the cell
-        // The address appears after the jetton amount in the message body
-
-        // For robustness, let's check the transaction's account addresses
-        // The in_msg.source is the Jetton wallet, but we need the actual user
-        // We can infer from the account that owns the Jetton wallet
-
-        // Alternative: Parse the raw_body more carefully
-        // The sender slice in transfer_notification starts after op(4)+query_id(8)+amount(var)
-        // Amount is a VarUInteger16, typically 1-16 bytes
-        // For 10000 HNCH = 10000 * 1e9 = 10e12 nanoHNCH, which fits in ~6 bytes
-
-        // Let's try a regex to find a potential address in the raw body
-        // TON addresses in raw form are 32 bytes (64 hex chars) after workchain (1 byte)
-        const addressMatch = rawBody.match(/([0-9a-f]{64})/i);
-        if (addressMatch && addressMatch[1]) {
-          // Found a potential address hash, but we need workchain too
-          // For now, assume workchain 0 (basechain)
-          const potentialAddr = '0:' + addressMatch[1];
-          // Verify it's different from the Jetton wallet
-          if (potentialAddr !== senderAddress) {
-            // Could be the sender, but let's be conservative
-            // Actually, let's skip complex parsing and just use what we have
-          }
+        // Validate action sequence: propose must come first, then challenges
+        if (action === 'propose' && hasProposal) {
+          console.log(`[parseParticipants] Duplicate propose (already have one), skipping`);
+          continue;
+        }
+        if (action === 'challenge' && !hasProposal) {
+          console.log(`[parseParticipants] Challenge without prior propose, skipping`);
+          continue;
         }
 
-        // For now, use the source address (Jetton wallet)
-        // The user can be determined later or we accept the Jetton wallet as proxy
+        console.log(`[parseParticipants] Found action=${action}, answer=${answer}, sender=${senderAddress}`);
+
 
         // Convert raw address to friendly format
         const friendlyAddress = rawToFriendly(senderAddress, network === 'testnet');
 
-        // Check if already tracked
-        const { data: existing } = await supabase
-          .from('market_participants')
-          .select('id')
-          .eq('market_address', instanceAddress)
-          .eq('participant_address', friendlyAddress)
-          .eq('escalation_level', escalationLevel)
-          .maybeSingle();
+        // Determine escalation level based on action
+        const currentLevel = action === 'propose' ? 0 : escalationLevel;
 
-        if (existing) {
-          console.log(`[parseParticipants] Participant ${friendlyAddress} already tracked at level ${escalationLevel}`);
-          if (action === 'challenge') escalationLevel++;
-          continue;
-        }
-
-        // Extract bond amount from Jetton transfer
-        // The jetton_amount is variable-length encoded in the raw_body
-        // For simplicity, we'll estimate from escalation level
+        // Extract bond amount - estimate from escalation level
+        // Bond doubles each escalation: 10k -> 20k -> 40k -> 80k HNCH
         const bondAmounts = [10000, 20000, 40000, 80000]; // in HNCH
-        const bondAmount = BigInt(bondAmounts[Math.min(escalationLevel, 3)] * 1e9);
+        const bondAmount = BigInt(bondAmounts[Math.min(currentLevel, 3)] * 1e9);
 
         participants.push({
           market_id: marketId,
@@ -407,32 +418,47 @@ async function parseParticipants(
           action,
           answer,
           bond_amount: bondAmount.toString(),
-          escalation_level: escalationLevel,
+          escalation_level: currentLevel,
           timestamp: tx.utime || Math.floor(Date.now() / 1000),
-          tx_hash: tx.hash || null,
+          tx_hash: txHash,
         });
 
-        console.log(`[parseParticipants] Found ${action} by ${friendlyAddress.substring(0, 8)}... answer=${answer} at level ${escalationLevel}`);
+        console.log(`[parseParticipants] Found ${action} by ${friendlyAddress.substring(0, 8)}... answer=${answer} at level ${currentLevel}`);
 
-        // Increment escalation level after recording
-        if (action === 'challenge') {
+        // Update state for next iteration
+        if (action === 'propose') {
+          hasProposal = true;
+        } else if (action === 'challenge') {
           escalationLevel++;
         }
       } catch (parseError) {
-        console.error(`[parseParticipants] Error parsing tx:`, parseError);
+        console.error(`[parseParticipants] Error parsing tx ${txHash.substring(0, 8)}:`, parseError);
         continue;
       }
     }
 
-    // Insert participants
+    // Insert participants (use upsert to handle any duplicates gracefully)
     if (participants.length > 0) {
       const { error } = await supabase
         .from('market_participants')
-        .insert(participants);
+        .upsert(participants, {
+          onConflict: 'market_address,participant_address,escalation_level',
+          ignoreDuplicates: true,
+        });
 
       if (error) {
         console.error(`[parseParticipants] Error inserting participants:`, error);
-        return 0;
+        // Try inserting one by one to see which fail
+        let inserted = 0;
+        for (const p of participants) {
+          const { error: singleError } = await supabase
+            .from('market_participants')
+            .insert(p);
+          if (!singleError) inserted++;
+          else console.log(`[parseParticipants] Skipped duplicate: ${p.participant_address.substring(0, 8)} level ${p.escalation_level}`);
+        }
+        console.log(`[parseParticipants] Inserted ${inserted}/${participants.length} participants for market ${marketId}`);
+        return inserted;
       }
 
       console.log(`[parseParticipants] Inserted ${participants.length} participants for market ${marketId}`);
