@@ -5,7 +5,9 @@ import { useContract } from '../hooks/useContract';
 import { useJettonBalance } from '../hooks/useJettonBalance';
 import { useMarkets, type Market, type MarketCategory } from '../hooks/useMarketsCache';
 import { useStakingInfo } from '../hooks/useStakingInfo';
+import { useMarketParticipants } from '../hooks/useMarketParticipants';
 import { getExplorerLink } from '../config/contracts';
+import { updateMarketInCache } from '../config/supabase';
 
 // Filter types
 type StatusFilter = 'all' | 'open' | 'waiting' | 'proposed' | 'challenged' | 'voting' | 'resolved';
@@ -15,10 +17,14 @@ type SortOption = 'newest' | 'oldest' | 'deadline-soon' | 'deadline-late' | 'alp
 export function Markets() {
   const wallet = useTonWallet();
   const userAddress = useTonAddress();
-  const { createMarket, proposeOutcome, challengeOutcome, settleMarket, castVeto, counterVeto, finalizeVeto, claimCreatorRebate, claimResolverReward, MIN_BOND_HNCH, MARKET_CREATION_FEE_HNCH } = useContract();
+  const { createMarket, proposeOutcome, challengeOutcome, settleMarket, castVeto, counterVeto, finalizeVeto, claimCreatorRebate, claimResolverReward, claimReward, MIN_BOND_HNCH, MARKET_CREATION_FEE_HNCH } = useContract();
   const { formattedBalance, balance } = useJettonBalance();
-  const { markets: fetchedMarkets, loading: marketsLoading, refetch: refetchMarkets, loadingProgress } = useMarkets();
+  const { markets: fetchedMarkets, loading: marketsLoading, refetch: refetchMarkets, syncMarkets, loadingProgress } = useMarkets();
   const stakingInfo = useStakingInfo();
+
+  // Sync markets state
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Create market state
   const [question, setQuestion] = useState('');
@@ -123,6 +129,8 @@ export function Markets() {
   const [isClaimingRebate, setIsClaimingRebate] = useState<string | null>(null);
   // Resolver reward claim state (v1.1)
   const [isClaimingResolver, setIsClaimingResolver] = useState<string | null>(null);
+  // Bond claim state
+  const [isClaimingBonds, setIsClaimingBonds] = useState<string | null>(null);
   const [countdowns, setCountdowns] = useState<Record<string, {
     vetoCountdown?: string;
     challengeCountdown?: string;
@@ -361,7 +369,13 @@ export function Markets() {
       setResolutionSource('');
       setResolutionDate('');
       setResolutionTime('23:59');
-      alert('Market creation transaction sent! The new market will appear after blockchain confirmation.');
+      alert('Market creation transaction sent! The new market will appear after blockchain confirmation (~15-30 seconds). Click "Refresh Markets" to check.');
+
+      // Auto-refresh markets after a delay to pick up the new market
+      setTimeout(() => {
+        console.log('[Markets] Auto-refreshing after market creation...');
+        refetchMarkets();
+      }, 15000); // 15 second delay for blockchain confirmation
     } catch (error: any) {
       console.error('Failed to create market:', error);
       alert(error.message || 'Failed to create market. Please try again.');
@@ -389,6 +403,19 @@ export function Markets() {
     setIsProposing(true);
     try {
       await proposeOutcome(market.address, proposeAnswer, bondAmount);
+
+      // Update cache to reflect proposed status (optimistic update)
+      await updateMarketInCache(market.id, {
+        status: 'proposed',
+        proposed_outcome: proposeAnswer,
+        current_bond: bondAmount * 1e9, // Convert to nano
+        proposed_at: Math.floor(Date.now() / 1000),
+        challenge_deadline: Math.floor(Date.now() / 1000) + 86400, // 24h challenge window
+      });
+
+      // Refetch markets to update UI
+      await refetchMarkets();
+
       setProposeMarketId(null);
       alert('Proposal transaction sent! Your outcome will be recorded after blockchain confirmation.');
     } catch (error: any) {
@@ -422,6 +449,19 @@ export function Markets() {
       // Challenge with opposite answer
       const oppositeAnswer = !market.proposedOutcome;
       await challengeOutcome(market.address, oppositeAnswer, bondAmount);
+
+      // Update cache to reflect challenged status (optimistic update)
+      await updateMarketInCache(market.id, {
+        status: 'challenged',
+        current_bond: bondAmount * 1e9, // Convert to nano
+        escalation_count: (market.escalationCount || 0) + 1,
+        proposed_outcome: oppositeAnswer,
+        challenge_deadline: Math.floor(Date.now() / 1000) + 86400, // Reset 24h window
+      });
+
+      // Refetch markets to update UI
+      await refetchMarkets();
+
       setChallengeMarketId(null);
       alert('Challenge transaction sent! Your challenge will be recorded after blockchain confirmation.');
     } catch (error: any) {
@@ -573,6 +613,26 @@ export function Markets() {
     }
   };
 
+  // Claim bonds after winning a market
+  const handleClaimBonds = async (market: Market) => {
+    if (!market.address) {
+      alert('Market address not available');
+      return;
+    }
+
+    setIsClaimingBonds(market.address);
+    try {
+      await claimReward(market.address);
+      alert('Bond claim transaction sent! Your winnings will be sent after blockchain confirmation.');
+      refetchMarkets();
+    } catch (error: any) {
+      console.error('Failed to claim bonds:', error);
+      alert(error.message || 'Failed to claim bonds. Please try again.');
+    } finally {
+      setIsClaimingBonds(null);
+    }
+  };
+
   // Helper to check if user can claim rebate for a market
   const canClaimRebate = (market: Market): boolean => {
     if (!userAddress || !market.rebateCreator) return false;
@@ -600,6 +660,55 @@ export function Markets() {
       market.resolverReward > 0 &&
       !market.resolverClaimed
     );
+  };
+
+  // Helper to check if user can claim bonds for a resolved market
+  const canClaimBonds = (market: Market, participantAddress?: string): boolean => {
+    if (!userAddress || !participantAddress) return false;
+    const userNormalized = userAddress.toLowerCase();
+    const participantNormalized = participantAddress.toLowerCase();
+    return market.status === 'resolved' && userNormalized === participantNormalized;
+  };
+
+  // Handle manual market sync
+  const handleSyncMarkets = async () => {
+    setIsSyncing(true);
+    setSyncMessage(null);
+
+    try {
+      const result = await syncMarkets('both', false);
+
+      if (result.success) {
+        if (result.totalMarketsAdded > 0) {
+          setSyncMessage({
+            type: 'success',
+            text: `Successfully synced ${result.totalMarketsAdded} new market${result.totalMarketsAdded !== 1 ? 's' : ''}!`,
+          });
+        } else {
+          setSyncMessage({
+            type: 'success',
+            text: 'All markets are up to date. No new markets found.',
+          });
+        }
+      } else {
+        setSyncMessage({
+          type: 'error',
+          text: result.error || 'Failed to sync markets. Please try again.',
+        });
+      }
+
+      // Clear message after 5 seconds
+      setTimeout(() => setSyncMessage(null), 5000);
+    } catch (error: any) {
+      console.error('Sync error:', error);
+      setSyncMessage({
+        type: 'error',
+        text: error.message || 'Failed to sync markets. Please try again.',
+      });
+      setTimeout(() => setSyncMessage(null), 5000);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const getStatusBadge = (status: Market['status']) => {
@@ -738,14 +847,38 @@ export function Markets() {
       <div className="markets-list">
         <div className="markets-header">
           <h3>Markets ({filteredMarkets.length} of {fetchedMarkets.length})</h3>
-          <button
-            className="btn-refresh"
-            onClick={() => refetchMarkets()}
-            disabled={marketsLoading}
-          >
-            {marketsLoading ? 'Loading...' : 'Refresh'}
-          </button>
+          <div className="markets-header-actions">
+            <div className="sync-info-tooltip">
+              <span className="info-icon" title="New markets appear within 5 minutes of creation on the blockchain">ℹ️</span>
+              <span className="info-text">New markets auto-sync every 120 minutes</span>
+            </div>
+            <button
+              className="btn-sync"
+              onClick={handleSyncMarkets}
+              disabled={isSyncing || marketsLoading}
+              title="Manually sync markets from blockchain"
+            >
+              {isSyncing ? 'Syncing...' : 'Sync Markets'}
+            </button>
+            <button
+              className="btn-refresh"
+              onClick={() => refetchMarkets()}
+              disabled={marketsLoading}
+            >
+              {marketsLoading ? 'Loading...' : 'Refresh'}
+            </button>
+          </div>
         </div>
+
+        {/* Sync notification message */}
+        {syncMessage && (
+          <div className={`sync-notification sync-${syncMessage.type}`}>
+            <span className="sync-notification-icon">
+              {syncMessage.type === 'success' ? '✅' : '❌'}
+            </span>
+            <span className="sync-notification-text">{syncMessage.text}</span>
+          </div>
+        )}
 
         {/* Filter Controls */}
         <div className="market-filters">
@@ -1204,6 +1337,31 @@ export function Markets() {
                           </span>
                         </div>
                       )}
+
+                      {/* Bond Claim for Winners */}
+                      {market.status === 'resolved' && market.currentAnswer !== undefined && (() => {
+                        const { winner } = useMarketParticipants(market.address, market.currentAnswer);
+                        if (!winner || !canClaimBonds(market, winner.participant.participantAddress)) return null;
+
+                        return (
+                          <div className="rebate-claim-action bond-claim-action">
+                            <button
+                              className="btn-claim-rebate btn-claim-bonds"
+                              onClick={() => handleClaimBonds(market)}
+                              disabled={isClaimingBonds === market.address}
+                            >
+                              {isClaimingBonds === market.address
+                                ? 'Claiming...'
+                                : `Claim Your Winnings: ${winner.winnings.toLocaleString()} HNCH`}
+                            </button>
+                            <div className="winnings-breakdown">
+                              <span className="breakdown-item">Bond returned: {winner.bondReturned.toLocaleString()} HNCH</span>
+                              <span className="breakdown-item">Bonds won: {winner.bondsWon.toLocaleString()} HNCH</span>
+                              <span className="breakdown-item">Bonus: {winner.bonus.toLocaleString()} HNCH</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
 
                       {/* Propose Form */}
                       {isProposingThis && (
