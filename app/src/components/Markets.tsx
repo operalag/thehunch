@@ -6,6 +6,7 @@ import { useJettonBalance } from '../hooks/useJettonBalance';
 import { useMarkets, type Market, type MarketCategory } from '../hooks/useMarketsCache';
 import { useStakingInfo } from '../hooks/useStakingInfo';
 import { useMarketParticipants } from '../hooks/useMarketParticipants';
+import { useMasterOracleBalance, MASTER_ORACLE_MIN_BALANCE } from '../hooks/useMasterOracleBalance';
 import { getExplorerLink } from '../config/contracts';
 
 // Filter types
@@ -144,6 +145,10 @@ export function Markets() {
   const { formattedBalance, balance } = useJettonBalance();
   const { markets: fetchedMarkets, loading: marketsLoading, refetch: refetchMarkets, syncMarkets, updateMarketStatus, loadingProgress } = useMarkets();
   const stakingInfo = useStakingInfo();
+  const masterOracleBalance = useMasterOracleBalance();
+
+  // Master Oracle info popup state
+  const [showMasterOracleInfo, setShowMasterOracleInfo] = useState(false);
 
   // Sync markets state
   const [isSyncing, setIsSyncing] = useState(false);
@@ -924,7 +929,117 @@ export function Markets() {
 
           {/* Create Market Form */}
           <div className="create-market">
-            <h3>Create New Market</h3>
+            <div className="create-market-header">
+              <h3>Create New Market</h3>
+              <button
+                type="button"
+                className="info-btn"
+                onClick={() => setShowMasterOracleInfo(!showMasterOracleInfo)}
+                title="Important: Master Oracle funding info"
+              >
+                ℹ️
+              </button>
+            </div>
+
+            {/* Master Oracle Info Popup */}
+            {showMasterOracleInfo && (
+              <div className="master-oracle-info-popup">
+                <div className="info-popup-header">
+                  <h4>⚠️ Master Oracle Contract Info</h4>
+                  <button
+                    type="button"
+                    className="close-btn"
+                    onClick={() => setShowMasterOracleInfo(false)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="info-popup-content">
+                  <div className={`balance-status ${masterOracleBalance.isLow ? 'low' : 'ok'}`}>
+                    <span className="status-icon">{masterOracleBalance.isLow ? '🔴' : '🟢'}</span>
+                    <span className="status-label">Current Balance:</span>
+                    <span className="status-value">
+                      {masterOracleBalance.loading
+                        ? 'Loading...'
+                        : masterOracleBalance.balance !== null
+                          ? `${masterOracleBalance.balance.toFixed(4)} TON`
+                          : 'Error loading'}
+                    </span>
+                    <button
+                      type="button"
+                      className="refresh-balance-btn"
+                      onClick={() => masterOracleBalance.refetch()}
+                      disabled={masterOracleBalance.loading}
+                    >
+                      🔄
+                    </button>
+                  </div>
+
+                  {masterOracleBalance.isLow && (
+                    <div className="warning-banner">
+                      <strong>⚠️ Balance too low!</strong> Market creation will fail.
+                      Minimum recommended: {MASTER_ORACLE_MIN_BALANCE} TON
+                    </div>
+                  )}
+
+                  <div className="info-section">
+                    <h5>Why does this matter?</h5>
+                    <p>
+                      The Master Oracle contract deploys new market contracts on the TON blockchain.
+                      It needs TON to pay for gas fees during deployment. If the balance is too low,
+                      your market creation will fail (your HNCH tokens may be stuck or bounced).
+                    </p>
+                  </div>
+
+                  <div className="info-section">
+                    <h5>How to fund the Master Oracle</h5>
+                    <ol>
+                      <li>Copy the Master Oracle address below</li>
+                      <li>Send TON from your wallet (recommended: 5-10 TON)</li>
+                      <li>Wait for the transaction to confirm</li>
+                      <li>Refresh the balance above to verify</li>
+                    </ol>
+                  </div>
+
+                  <div className="address-section">
+                    <label>Master Oracle Address:</label>
+                    <div className="address-copy">
+                      <code>{masterOracleBalance.address}</code>
+                      <button
+                        type="button"
+                        className="copy-btn"
+                        onClick={() => {
+                          navigator.clipboard.writeText(masterOracleBalance.address);
+                          alert('Address copied to clipboard!');
+                        }}
+                      >
+                        📋 Copy
+                      </button>
+                    </div>
+                    <a
+                      href={getExplorerLink(masterOracleBalance.address, 'account')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="explorer-link"
+                    >
+                      View on Explorer ↗
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Low balance warning banner (always visible when low) */}
+            {masterOracleBalance.isLow && !showMasterOracleInfo && (
+              <div className="master-oracle-warning-banner" onClick={() => setShowMasterOracleInfo(true)}>
+                <span className="warning-icon">⚠️</span>
+                <span className="warning-text">
+                  Master Oracle balance low ({masterOracleBalance.balance?.toFixed(4)} TON).
+                  Market creation may fail. <strong>Click for details.</strong>
+                </span>
+              </div>
+            )}
+
             <p className="form-description">
               Creating a market costs ~0.5 TON for deployment. After the resolution date, anyone can propose outcomes by bonding HNCH tokens.
             </p>
