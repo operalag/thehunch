@@ -1017,7 +1017,7 @@ export function Markets() {
                       </button>
                     </div>
                     <a
-                      href={getExplorerLink(masterOracleBalance.address, 'account')}
+                      href={getExplorerLink(masterOracleBalance.address)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="explorer-link"
