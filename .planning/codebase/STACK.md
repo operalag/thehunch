@@ -1,155 +1,151 @@
 # Technology Stack
 
-**Analysis Date:** 2026-02-01
+**Analysis Date:** 2026-02-05
 
 ## Languages
 
 **Primary:**
-- TypeScript 5.8.3 - Full codebase (both components and utilities)
-- React 18.3.1 - UI component library
-- CSS (Tailwind) 3.4.17 - Styling system
+- TypeScript 5.8.3 - All application code, type-safe throughout
+- JavaScript - Configuration files (ESLint, PostCSS, Tailwind)
+
+**Secondary:**
+- CSS - Via Tailwind CSS utility classes
+- HTML - React JSX templates
 
 ## Runtime
 
 **Environment:**
-- Node.js (inferred from package manager)
-- Browser (client-side only)
+- Node.js (version not pinned in project)
+- Browser (client-side React SPA)
 
 **Package Manager:**
-- npm (package-lock.json present)
-- Alternative: Bun (bun.lockb file indicates Bun support)
-- Lockfile: Present (package-lock.json, bun.lockb)
+- npm (Node Package Manager)
+- Lockfile: `package-lock.json` present
 
 ## Frameworks
 
 **Core:**
 - React 18.3.1 - UI framework
+- Vite 5.4.19 - Build tool and dev server
 - React Router DOM 6.30.1 - Client-side routing
-- Vite 5.4.19 - Build tool and dev server (configured in `vite.config.ts`)
 
-**UI Component System:**
-- shadcn/ui (component library built on Radix UI primitives)
-- Radix UI - Accessible component primitives
-  - Accordion, Dialog, Dropdown, Select, Tabs, Tooltip, and 20+ other components
-  - All versions ^1.x to ^2.x, imported as @radix-ui/react-*
-
-**Styling & Theming:**
+**UI Components:**
+- Radix UI - Complete component library (@radix-ui/react-*)
+  - Includes: accordion, alert-dialog, dialog, dropdown, popover, select, tabs, toast, tooltip, and 20+ more primitives
+- shadcn/ui architecture - Component system built on Radix
 - Tailwind CSS 3.4.17 - Utility-first CSS framework
-  - Configuration: `tailwind.config.ts` with custom theme, animations, sidebar colors
-  - CSS Variables for dynamic theming (HSL-based color system)
-- PostCSS 8.5.6 - CSS processing
-- Autoprefixer 10.4.21 - Browser compatibility
+- Framer Motion 12.23.24 - Animation library
 
 **State Management:**
-- Zustand 5.0.9 - Lightweight state management
-  - Used in: `src/store/blockchainStore.ts`
-  - Includes persist middleware for local storage
-
-**Data Fetching & Caching:**
-- TanStack React Query 5.83.0 - Server state management
-  - Configured in `src/App.tsx` with QueryClientProvider
-
-**Forms & Validation:**
+- Zustand 5.0.9 - Global state management
+- @tanstack/react-query 5.83.0 - Server state/async data fetching
 - React Hook Form 7.61.1 - Form state management
-- @hookform/resolvers 3.10.0 - Form validation resolvers
-- Zod 3.25.76 - Schema validation library
 
-**Animation:**
-- Framer Motion 12.23.24 - Animation library (used in all section components)
-- Tailwind CSS Animate 1.0.7 - CSS animation utilities
+**Styling:**
+- Tailwind CSS 3.4.17
+- PostCSS 8.5.6
+- Autoprefixer 10.4.21
+- tailwindcss-animate 1.0.7 - Animation utilities
+- class-variance-authority 0.7.1 - Component variant styling
+- tailwind-merge 2.6.0 - Conditional class merging
 
-**Blockchain/Web3:**
-- @tonconnect/ui-react 2.3.1 - TON wallet connection and UI components
-  - Manifest URL: https://hunch-demo-frontend.vercel.app/tonconnect-manifest.json
+**Testing:**
+- No testing framework detected
 
-**Charts & Visualization:**
-- Recharts 2.15.4 - React charting library
-
-**UI Utilities:**
-- Lucide React 0.462.0 - Icon library
-- Class Variance Authority 0.7.1 - CSS class composition
-- clsx 2.1.1 - Conditional CSS class builder
-- Tailwind Merge 2.6.0 - Merge Tailwind classes
-- Sonner 1.7.4 - Toast notifications
-- Embla Carousel React 8.6.0 - Carousel/slider component
-- Vaul 0.9.9 - Drawer/modal primitives
-- React Resizable Panels 2.1.9 - Resizable UI panels
-- Input OTP 1.4.2 - OTP input component
-- React Day Picker 8.10.1 - Date picker component
-- Date-fns 3.6.0 - Date utility library
-- Next Themes 0.3.0 - Theme management
-
-**Development Tools:**
-- TypeScript ESLint 8.38.0 - TypeScript linting
-  - ESLint 9.32.0 - JavaScript linter
-  - ESLint config: `eslint.config.js` (flat config format)
-- ESLint Plugin React Hooks 5.2.0 - React hooks linting rules
-- ESLint Plugin React Refresh 0.4.20 - Vite React refresh linting
-- @vitejs/plugin-react-swc 3.11.0 - SWC compiler for Vite (faster transpilation)
-- Lovable Tagger 1.1.11 - Component tagging utility (dev mode)
-- @types/react 18.3.23 - React type definitions
-- @types/react-dom 18.3.7 - React DOM type definitions
-- @types/node 22.16.5 - Node.js type definitions
-- Globals 15.15.0 - Global variable types
-- @tailwindcss/typography 0.5.16 - Tailwind typography plugin
+**Build/Dev:**
+- Vite 5.4.19 - Build tool
+- @vitejs/plugin-react-swc 3.11.0 - React Fast Refresh via SWC
+- TypeScript 5.8.3 - Type checking
+- ESLint 9.32.0 - Linting
+- lovable-tagger 1.1.11 - Development component tagging
 
 ## Key Dependencies
 
 **Critical:**
-- @tonconnect/ui-react 2.3.1 - TON blockchain wallet integration (core to app functionality)
-- zustand 5.0.9 - State management for blockchain data and user state
-- react-router-dom 6.30.1 - Page navigation and routing
-- zod 3.25.76 - Runtime type validation for forms
+- @tonconnect/ui-react 2.3.1 - TON blockchain wallet connection (critical for wallet integration)
+- react 18.3.1 - Core framework
+- react-dom 18.3.1 - React DOM renderer
+- zustand 5.0.9 - Application state (stores wallet state, events, user data)
 
 **Infrastructure:**
-- vite 5.4.19 - Fast build tool with dev server
-- tailwindcss 3.4.17 - CSS framework
-- typescript 5.8.3 - Type system
+- @tanstack/react-query 5.83.0 - Async state management
+- react-router-dom 6.30.1 - Navigation
+
+**UI/UX:**
+- @radix-ui/* packages (30+ packages) - Headless UI primitives
+- lucide-react 0.462.0 - Icon library
+- framer-motion 12.23.24 - Animations
+- next-themes 0.3.0 - Theme switching
+- sonner 1.7.4 - Toast notifications
+
+**Forms & Validation:**
+- react-hook-form 7.61.1 - Form management
+- @hookform/resolvers 3.10.0 - Form validation resolvers
+- zod 3.25.76 - Schema validation
+
+**Utilities:**
+- date-fns 3.6.0 - Date manipulation
+- clsx 2.1.1 - Conditional classnames
+- cmdk 1.1.1 - Command menu component
+
+**Data Visualization:**
+- recharts 2.15.4 - Chart library
+
+**UI Components:**
+- embla-carousel-react 8.6.0 - Carousel component
+- react-day-picker 8.10.1 - Date picker
+- react-resizable-panels 2.1.9 - Resizable layouts
+- input-otp 1.4.2 - OTP input component
+- vaul 0.9.9 - Drawer component
 
 ## Configuration
 
 **Environment:**
-- Defined in: `app/.env.example`
-- Key variables required:
-  - VITE_SUPABASE_URL - Supabase project URL (optional for market caching)
-  - VITE_SUPABASE_ANON_KEY - Supabase anonymous API key (optional)
-  - VITE_TONAPI_KEY - TON API key for improved rate limits (optional)
-- Note: Network switching handled via localStorage UI, no environment variable needed
+- Environment variables via Vite (VITE_* prefix)
+- `.env.example` shows optional configuration:
+  - `VITE_SUPABASE_URL` - Supabase URL (for market caching, not currently used)
+  - `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key (optional)
+  - `VITE_TONAPI_KEY` - TONAPI key (optional, for better rate limits)
+- Network switching handled via localStorage in UI
+
+**TypeScript:**
+- Config: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`
+- Path alias: `@/*` maps to `./src/*`
+- Strict mode disabled (noImplicitAny, strictNullChecks both false)
+- Skip lib check enabled
 
 **Build:**
-- Build config: `vite.config.ts`
-  - Server host: `::`
-  - Server port: 8080
-  - Path alias: `@/` → `./src/`
-  - Plugins: React SWC, Lovable Tagger (dev mode)
-- Tailwind config: `tailwind.config.ts`
-  - Dark mode: class-based
-  - Custom keyframes: fade-in, slide-up, pulse-glow, float
-  - Sidebar component theme variables
-- PostCSS config: `postcss.config.js`
-  - Tailwind CSS + Autoprefixer
-- TypeScript config: `tsconfig.app.json` (primary), `tsconfig.json` (root)
-  - Target: ES2020
-  - Module: ESNext
-  - Strict mode: Disabled (for flexibility)
-- Component config: `components.json` (shadcn/ui)
-  - Template: TSX
-  - CSS: Tailwind with CSS variables
+- `vite.config.ts` - Vite configuration
+  - React plugin with SWC compiler
+  - Development: lovable-tagger for component debugging
+  - Dev server: port 8080, IPv6 support
+  - Path alias: `@` resolves to `./src`
+
+**Linting:**
+- `eslint.config.js` - ESLint configuration
+  - TypeScript ESLint parser
+  - React hooks rules
+  - React refresh rules
+  - Unused vars rule disabled
+
+**Styling:**
+- `tailwind.config.ts` - Tailwind configuration
+  - Dark mode via class strategy
+  - Custom color system (HSL variables)
+  - Custom animations (fade-in, slide-up, pulse-glow, float)
+- `postcss.config.js` - PostCSS with Tailwind and Autoprefixer
 
 ## Platform Requirements
 
 **Development:**
-- Node.js (npm/Bun compatible)
-- TypeScript support required
-- Modern browser (ES2020 target)
+- Node.js (no specific version pinned)
+- npm or compatible package manager
+- Modern browser for testing
 
 **Production:**
-- Deployment: Vercel (configured via `.vercel/project.json`)
-  - Project ID: prj_BoKYAjDNJtOQBIvriXVvz2RoyCd0
-  - Organization ID: team_gnGwRxIk4OQbhNVObDruMSmV
-- Hosting: Static site (frontend only, no backend)
-- Domain: https://hunch.lovable.app/ and https://hunch-demo-frontend.vercel.app/
+- Static hosting (SPA)
+- Deployment target: Vercel (based on `tonconnect-manifest.json` URL pointing to `hunch-demo-frontend.vercel.app`)
 
 ---
 
-*Stack analysis: 2026-02-01*
+*Stack analysis: 2026-02-05*

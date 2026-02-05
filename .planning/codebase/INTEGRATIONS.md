@@ -1,107 +1,121 @@
 # External Integrations
 
-**Analysis Date:** 2026-02-01
+**Analysis Date:** 2026-02-05
 
 ## APIs & External Services
 
-**Blockchain/Web3:**
-- TON Connect - Wallet connection and authentication
-  - SDK/Client: @tonconnect/ui-react 2.3.1
-  - Component: `src/components/WalletConnect.tsx`
-  - Manifest URL: https://hunch-demo-frontend.vercel.app/tonconnect-manifest.json
-  - Usage: Connect user wallet, read account address, enable blockchain transactions
+**Blockchain:**
+- TON Blockchain - Prediction market smart contracts
+  - SDK/Client: `@tonconnect/ui-react` 2.3.1
+  - Purpose: Wallet connection, transaction signing, smart contract interaction
+  - Manifest: `public/tonconnect-manifest.json` (configured for hunch-demo-frontend.vercel.app)
+  - Integration: `src/main.tsx` wraps app in `TonConnectUIProvider`
+  - Wallet support: TonKeeper, TonHub, OpenMask (via TonConnect protocol)
 
-**Third-Party Services (Optional/Configured):**
-- Telegram Web App - Native integration for Telegram users
-  - Script: https://telegram.org/js/telegram-web-app.js (loaded in `index.html`)
-  - Hook: `src/hooks/useTelegram.tsx`
-  - Data accessed: User ID, first name, last name, username, language, premium status, theme
-  - Usage: Allow Telegram users to access the app natively within Telegram
+**TONAPI (Optional):**
+- Service: TONAPI
+  - Purpose: Enhanced rate limits for TON blockchain API calls
+  - Auth: `VITE_TONAPI_KEY` environment variable
+  - Status: Optional integration (better rate limits)
+
+**Telegram WebApp:**
+- Service: Telegram Mini Apps
+  - Purpose: Run as Telegram bot/mini app
+  - Integration: `src/hooks/useTelegram.tsx`
+  - API: `window.Telegram.WebApp` global
+  - Features: User detection, theme integration, viewport management
+  - Status: Conditional (works standalone or inside Telegram)
 
 ## Data Storage
 
 **Databases:**
-- Supabase (optional, for market caching)
-  - Connection: VITE_SUPABASE_URL environment variable
-  - API Key: VITE_SUPABASE_ANON_KEY environment variable
-  - Status: Not currently active in code (configured but not integrated)
-  - Intended use: Cache market data and user submissions
+- Supabase (Optional, Not Currently Active)
+  - Connection: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+  - Purpose: Market caching (mentioned in `.env.example` but no implementation detected)
+  - Client: None detected in codebase
+  - Status: Planned/commented out
 
-**Local Storage:**
-- Browser localStorage (primary state persistence)
-  - Zustand persist middleware: `src/store/blockchainStore.ts`
-  - Key: hunch-storage
-  - Data stored: User blockchain state, wallet address, balance, staking info, events
-  - No server-side persistence currently implemented
+**Client-Side Storage:**
+- localStorage
+  - Library: Zustand persist middleware
+  - Key: `hunch-storage`
+  - Purpose: Persist user wallet state, events, balances
+  - Location: `src/store/blockchainStore.ts`
+
+**Blockchain Storage:**
+- TON Blockchain
+  - Smart contracts store: markets, staking data, outcomes, bonds
+  - Read via: TonConnect/TONAPI
+  - Write via: Wallet transactions
 
 **File Storage:**
-- Local filesystem only (static assets in `/public`)
-- CDN: Images and assets served through Vercel deployment
+- Static assets only (public folder)
+  - Images: `public/favicon.png`, `public/og-image.png`
+  - Manifest: `public/tonconnect-manifest.json`
 
 **Caching:**
-- TanStack React Query (client-side caching)
-  - Configured in `src/App.tsx`
-  - Purpose: Cache server state when API integration is added
-  - Currently not actively used for data fetching
+- None detected (no Redis, no service workers)
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- TON Connect (TON blockchain wallet)
-  - Implementation: TonConnectButton component and useTonWallet hook
-  - Location: `src/components/WalletConnect.tsx`
-  - Behavior: Users connect real TON wallet OR use demo mode
-  - State sync: Wallet address synced to blockchainStore via setAddress()
-  - Demo mode fallback: "Demo Mode" button for testing without wallet
+- TON Connect (Decentralized)
+  - Implementation: Wallet-based authentication
+  - Package: `@tonconnect/ui-react`
+  - Flow: Connect wallet → Sign message → Derive address
+  - Components: `src/components/WalletConnect.tsx`
+  - Demo Mode: Fallback demo wallet (`EQC...DemoUser`) when no real wallet connected
 
-**Telegram Auth:**
-- Telegram Web App native authentication
-  - Location: `src/hooks/useTelegram.tsx`
-  - Data: User identity retrieved from Telegram.WebApp.initDataUnsafe
-  - Verification: Not currently implemented (raw data access)
+**Session Management:**
+- Wallet address stored in Zustand store
+- Persisted to localStorage
+- No traditional JWT/session tokens
 
 ## Monitoring & Observability
 
 **Error Tracking:**
-- None detected (not integrated)
+- None detected (no Sentry, no Bugsnag)
 
 **Logs:**
-- Console logging only (standard browser console)
-- No structured logging framework detected
-- State management via Zustand with localStorage provides audit trail of actions
+- Console only
+- No structured logging service
+
+**Analytics:**
+- None detected (no Google Analytics, no Mixpanel)
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- Vercel (primary)
-  - Project: thehunch-claude
-  - Deployment: Automatic from git push to main branch
-  - Domains: https://hunch.lovable.app/, https://hunch-demo-frontend.vercel.app/
+- Vercel
+  - Evidence: `tonconnect-manifest.json` references `hunch-demo-frontend.vercel.app`
+  - Type: Static SPA hosting
 
 **CI Pipeline:**
-- Git-based automatic deployment (Vercel default)
-- No custom CI configuration detected
-- Build command: `npm run build` (runs vite build)
-- Preview: `npm run preview` (local preview)
+- None detected in repository
+- Likely using Vercel's automatic GitHub integration
+
+**Build Output:**
+- Vite static build
+- Commands: `npm run build` (production), `npm run build:dev` (development build)
 
 ## Environment Configuration
 
-**Required env vars (optional integrations):**
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_TONAPI_KEY=your-tonapi-key
-```
+**Required env vars:**
+- None required for basic functionality
+- All external integrations are optional
+
+**Optional env vars:**
+- `VITE_SUPABASE_URL` - Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `VITE_TONAPI_KEY` - TONAPI rate limit key
 
 **Secrets location:**
-- `.env.local` (git-ignored, local development)
-- `.env` (if created from `.env.example`)
-- Vercel environment variables (production configuration)
+- `.env.local` (gitignored)
+- `.env.example` provides template
 
 **Network Configuration:**
-- TON network: Switched via localStorage UI toggle (not environment-based)
-- No hardcoded network RPC endpoints in codebase
-- Assumes useTonWallet hook handles network switching internally
+- Network switching (mainnet/testnet) handled via localStorage
+- No environment variable for network selection
 
 ## Webhooks & Callbacks
 
@@ -110,43 +124,48 @@ VITE_TONAPI_KEY=your-tonapi-key
 
 **Outgoing:**
 - None detected
+- Smart contract events queried via blockchain, not pushed
 
-## Data Flow
+## Smart Contract Integration
 
-**Current State (Frontend-Only):**
-1. User connects TON wallet via TonConnect
-2. Wallet address stored in Zustand blockchainStore (localStorage persisted)
-3. Mock blockchain data generated locally (in-memory state)
-4. UI updates reflect local state changes only
-5. No server-side persistence or API calls currently implemented
+**Contract Addresses (Testnet per app/README.md):**
+- HNCH Jetton Master: `kQDkukAhHvMleIcMyLho8kJl69D3SbqPL8uROGPnvLelXOP8`
+- Price Oracle: `kQDlog79RnYke1cLEd0ZkwmypTEhHi1snU5GKVEFiJs67uXa`
+- Fee Distributor: `kQAaPoUoA0aakiPcHF2c2VnYixeWYxY3WQ6B1KACR_ueWfmJ`
+- Master Oracle: `kQAPl-1SsNmu879wojb7y2_syC5iTbV_fB7Sjrn8mdGovDTc`
 
-**Planned Integration Flow (from .env.example):**
-1. User actions trigger events (create market, vote, stake)
-2. Events could be stored via Supabase (not yet implemented)
-3. TON API optional for better rate limits on chain queries (not yet implemented)
-4. Query data cached via React Query (not yet actively used)
+**Mainnet Contracts (per HEDERA_PORTING_GUIDE.md):**
+- Master Oracle: `EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J`
+- Fee Distributor: `EQDgNzF96F7yawAkZ83vEijSUlfA4YWuA_MS2ft_3fgrI3Ld`
+- HNCH Jetton Master: `EQD529CGTmX1Tgcsn3vYBfUPKrVdgermb1T8o5MKLGOGdHpb`
 
-## SDK & Client Library Details
+**Contract Interaction:**
+- Method: TonConnect wallet transactions
+- State Management: `src/store/blockchainStore.ts` (currently mock implementation)
+- Demo Mode: Local state simulation when wallet not connected
 
-**@tonconnect/ui-react:**
-- Component: `TonConnectButton` - Pre-styled wallet connect button
-- Hook: `useTonWallet()` - Access connected wallet state
-  - Returns: wallet object with account.address, account.chain, etc.
-- Custom hook: `src/hooks/useTelegram.tsx` abstracts Telegram Web API
+## Third-Party UI/CDN
 
-**Zustand Store:**
-- File: `src/store/blockchainStore.ts`
-- Persistence: Enabled via persist middleware
-- Storage key: hunch-storage
-- State shape:
-  ```
-  user: { address, hnchBalance, stakedBalance, delegatedTo, pendingRewards }
-  events: OracleEvent[]
-  protocolRevenue: number
-  totalStakedGlobal: number
-  isLoading: boolean
-  ```
+**Fonts:**
+- Not detected (likely system fonts or Tailwind defaults)
+
+**CDN:**
+- None detected (all assets bundled via Vite)
+
+**External Scripts:**
+- Telegram WebApp SDK (loaded conditionally from Telegram context)
+
+## Potential Future Integrations
+
+**Mentioned but Not Implemented:**
+- Supabase for market caching (`.env.example` includes variables, no code detected)
+
+**Hedera Migration Planned:**
+- Documentation exists for porting to Hedera blockchain (`.planning/HEDERA_PORTING_GUIDE.md`)
+- Would replace TON with Hedera Hashgraph
+- Would replace TonConnect with HashConnect
+- Would replace Jettons with Hedera Token Service (HTS)
 
 ---
 
-*Integration audit: 2026-02-01*
+*Integration audit: 2026-02-05*

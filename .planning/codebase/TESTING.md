@@ -1,274 +1,172 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-02-01
+**Analysis Date:** 2026-02-05
 
 ## Test Framework
 
-**Status:** No test framework currently configured or in use.
+**Runner:**
+- None detected in project
+- No test configuration files found (no `jest.config.*`, `vitest.config.*`, `playwright.config.*`)
 
-**Test Files:** None found in codebase (`find /Users/tonicaradonna/thehunch-claude/app/src -name "*.test.*" -o -name "*.spec.*"` returns no results)
+**Assertion Library:**
+- Not applicable - no testing framework configured
 
-**Note:** This is a React + TypeScript frontend application without automated test infrastructure. Testing is currently manual/ad-hoc only.
-
-## Development & Type Safety
-
-**Compile-Time Safety:**
-- TypeScript strict mode enabled in `tsconfig.app.json`
-- Config location: `/Users/tonicaradonna/thehunch-claude/app/tsconfig.app.json`
-- Key settings:
-  ```json
-  {
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  }
-  ```
-
-**Type Checking:**
-- Run via build process: `npm run build` (runs `tsc -b && vite build`)
-- Command from package.json: `/Users/tonicaradonna/thehunch-claude/app/package.json`
-- TypeScript version: ~5.9.3
-
-**ESLint Linting:**
-- Command: `npm run lint` (runs `eslint .`)
-- Config: `/Users/tonicaradonna/thehunch-claude/app/eslint.config.js`
-- Checks for unused variables, React hook rules, React Refresh violations
-
-## Manual Testing Approach
-
-**Runtime Errors:**
-The application uses error boundaries and try-catch blocks to handle runtime issues gracefully rather than automated testing.
-
-**Error Boundary Pattern (from `/Users/tonicaradonna/thehunch-claude/app/src/components/ErrorBoundary.tsx`):**
-```typescript
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false
-  };
-
-  public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`[ErrorBoundary${this.props.name ? `: ${this.props.name}` : ''}] Caught error:`, error, errorInfo);
-  }
-
-  public render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-      return (
-        <div className="error-boundary-fallback">
-          <h3>Something went wrong{this.props.name ? ` in ${this.props.name}` : ''}</h3>
-          <p>{this.state.error?.message || 'Unknown error'}</p>
-          <button onClick={() => this.setState({ hasError: false, error: undefined })}>
-            Try again
-          </button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
+**Run Commands:**
+```bash
+# No test commands available
+# package.json scripts do not include test commands
 ```
 
-**Error Wrapping Pattern (from `/Users/tonicaradonna/thehunch-claude/app/src/App.tsx`):**
-```typescript
-<ErrorBoundary name="Dashboard" fallback={<ErrorFallback name="Dashboard" />}>
-  <Suspense fallback={<LoadingFallback name="Dashboard" />}>
-    <Dashboard />
-  </Suspense>
-</ErrorBoundary>
+**Available Scripts:**
+```bash
+npm run dev              # Start development server (Vite)
+npm run build            # Production build
+npm run build:dev        # Development build
+npm run lint             # Run ESLint
+npm run preview          # Preview production build
 ```
 
-## Code Organization for Testability
+## Test File Organization
 
-**Current Structure:**
-- Logic organized in custom hooks (`/Users/tonicaradonna/thehunch-claude/app/src/hooks/`)
-- Each hook encapsulates API calls, state management, and calculations
-- Separation makes individual hooks easier to test (if testing were implemented)
+**Location:**
+- No test files exist in the project
+- No `__tests__` directories found
+- No `*.test.ts`, `*.test.tsx`, `*.spec.ts`, or `*.spec.tsx` files in source directories
 
-**Hook File Examples:**
-- `useContract.ts`: Smart contract interactions, transaction building
-- `useStakingInfo.ts`: Complex state assembly from multiple API calls
-- `useMarkets.ts`: Market data fetching with rate limiting
-- `useJettonBalance.ts`: Token balance fetching with retry logic
-- `useMarketsCache.ts`: Supabase caching layer
+**Naming:**
+- Not applicable - no test files present
 
-**Component Organization:**
-- Components import hooks for business logic
-- Minimal component logic (mostly UI rendering and event handling)
-- Example from `Stake.tsx`:
-  ```typescript
-  export function Stake() {
-    const wallet = useTonWallet();
-    const { stakeTokens, unstakeTokens, claimStakerRewards } = useContract();
-    const { balance, formattedBalance } = useJettonBalance();
-    const { formattedUserStake, canUnstake } = useStakingInfo();
-    // ... component logic
-  }
-  ```
+**Structure:**
+- Not established
 
-## Testing Recommendations for Future
+## Test Structure
 
-**To Implement Unit Tests:**
+**Suite Organization:**
+- No testing patterns established
 
-1. **Framework Setup:**
-   - Install Vitest or Jest
-   - Add test configuration file
-   - Location: `/Users/tonicaradonna/thehunch-claude/app/vitest.config.ts` or `jest.config.js`
+**Patterns:**
+- Testing is not implemented in this project
 
-2. **Priority Areas:**
-   - Hook logic in `/Users/tonicaradonna/thehunch-claude/app/src/hooks/`
-     - `useStakingInfo.ts`: Complex epoch calculation and balance formatting
-     - `useContract.ts`: Transaction building, address conversion
-     - `useMarkets.ts`: Rate limiting, batch fetching, retry logic
-   - Config functions in `/Users/tonicaradonna/thehunch-claude/app/src/config/`
-     - Address conversion utilities
-     - Network configuration helpers
+## Mocking
 
-3. **Component Testing:**
-   - Use React Testing Library for component tests
-   - Test user interactions (button clicks, form submissions)
-   - Mock hooks using custom implementations or libraries
+**Framework:**
+- Not applicable - no mocking framework configured
 
-4. **Integration Testing:**
-   - Test hook interactions with mock API responses
-   - Test error boundary error catching
-   - Test network switching behavior
+**Patterns:**
+- No mocking patterns established
 
-## Validation & Guards
+**What to Mock:**
+- Guidelines not established
 
-**Defensive Programming Patterns:**
+**What NOT to Mock:**
+- Guidelines not established
 
-**Address Validation:**
-```typescript
-// From useContract.ts
-const friendlyAddress: string;
-try {
-  const addr = Address.parse(to);
-  friendlyAddress = addr.toString({ testOnly: isTestnet, bounceable: true });
-} catch (e) {
-  console.error(`[sendTransaction] Failed to parse address: ${to}`, e);
-  throw new Error(`Invalid address format: ${to}`);
-}
+## Fixtures and Factories
+
+**Test Data:**
+- No test data fixtures exist
+
+**Location:**
+- No fixtures directory
+
+## Coverage
+
+**Requirements:**
+- No coverage requirements enforced
+- No coverage tooling configured
+
+**View Coverage:**
+```bash
+# No coverage command available
 ```
 
-**Amount Validation:**
-```typescript
-// From useContract.ts
-if (bondAmount < MIN_BOND_HNCH) {
-  throw new Error(`Minimum bond is ${MIN_BOND_HNCH.toLocaleString()} HNCH`);
-}
+## Test Types
 
-// From Stake.tsx
-const hnchAmount = parseFloat(amount);
-if (isNaN(hnchAmount) || hnchAmount <= 0) {
-  throw new Error('Invalid stake amount');
-}
-```
+**Unit Tests:**
+- Not implemented
 
-**Connection Checks:**
-```typescript
-// From useContract.ts
-if (!wallet) {
-  throw new Error('Wallet not connected');
-}
+**Integration Tests:**
+- Not implemented
 
-if (!userAddress) {
-  throw new Error('Wallet not connected');
-}
-```
+**E2E Tests:**
+- Not implemented
 
-**API Response Validation:**
-```typescript
-// From useStakingInfo.ts
-if (userData.stack && userData.stack.length >= 2) {
-  const stakeValue = userData.stack[0];
-  if (typeof stakeValue === 'object' && stakeValue.num) {
-    // Parse and use
-  } else if (typeof stakeValue === 'string') {
-    // Parse as string
-  } else {
-    console.log('[StakingInfo Debug] Could not parse stakeValue, type:', typeof stakeValue);
-  }
-}
-```
+## Common Patterns
 
-## Logging for Debugging
+**Async Testing:**
+- No async testing patterns established
 
-**Debug Logs by Feature:**
+**Error Testing:**
+- No error testing patterns established
 
-**Jetton Balance Fetching** (from `useJettonBalance.ts`):
-```typescript
-console.log(`[HNCH Balance] Network: ${config.name}`);
-console.log(`[HNCH Balance] Fetching for ${address}`);
-console.log(`[HNCH Balance] API: ${apiUrl}`);
-console.warn(`[HNCH Balance] Rate limited, retry ${retryAttempt + 1}/5...`);
-console.log(`[HNCH Balance] SUCCESS! Balance: ${balanceValue}`);
-console.error('[HNCH Balance] FAILED:', err.message);
-```
+## Testing Recommendations
 
-**Staking Info Fetching** (from `useStakingInfo.ts`):
-```typescript
-console.log('[StakingInfo] Hook called, TonConnect address:', address);
-console.log('[StakingInfo] Address conversion:', { input, output, network });
-console.log('[StakingInfo Debug] API response status:', status, ok);
-console.log('[StakingInfo Debug] get_epoch_info response:', epochData);
-console.log('[StakingInfo] Returning values:', { userStake, actualCurrentEpoch, claimableEpochs });
-```
+Based on the codebase analysis, if testing were to be added, the following areas would benefit most:
 
-**Transaction Building** (from `useContract.ts`):
-```typescript
-console.log(`[getJettonWallet] Fetching for ${userAddress}`);
-console.log(`[sendTransaction] Converted address: ${to} -> ${friendlyAddress}`);
-console.log('[Stake Debug] OP_CODES.STAKE =', OP_CODES.STAKE, '(expected: 3)');
-console.log('[Stake Debug] Forward payload BOC:', payloadCell.toBoc().toString('hex'));
-```
+**Critical Areas to Test:**
 
-**Market Fetching** (from `useMarkets.ts`):
-```typescript
-console.log('[Markets] TONAPI key configured:', hasApiKey ? 'yes' : 'no');
-console.log('[Markets] Batch item failed:', err);
-console.log(`[Markets] Rate limited, retrying in ${retryDelay}ms...`);
-console.log('[Markets] Instance count response:', countData);
-```
+1. **Blockchain Data Parsing** (`app/src/hooks/useMarkets.ts`):
+   - Address conversion functions (`toFriendlyAddress`)
+   - Number parsing from hex (`parseNum`, `parseHexNum`)
+   - Cell data parsing (`parseQuestionCell`)
 
-## Current Coverage Gaps
+2. **Network Configuration** (`app/src/config/networks.ts`, `app/src/config/contracts.ts`):
+   - Network switching logic
+   - Contract address getters
+   - Explorer link generation
 
-**Untested Areas:**
-- All React components (no component tests)
-- Hook integration behavior (hooks rarely tested in isolation with mock data)
-- Contract interaction encoding (address conversions, cell building)
-- Error boundary fallback rendering
-- Supabase cache layer functionality
+3. **Custom Hooks** (`app/src/hooks/`):
+   - `useMarkets` - complex fetching and state management
+   - `useStakingInfo` - staking calculations and epoch logic
+   - `useJettonBalance` - balance fetching and formatting
+   - `useContract` - transaction building
 
-**Risk Areas Without Tests:**
-- `useStakingInfo.ts` (complex epoch calculation, hex value parsing)
-- `useMarkets.ts` (rate limiting logic, batch fetching, data transformation)
-- `useContract.ts` (transaction building, address format conversion)
-- Error recovery in async operations (retry logic)
+4. **Error Boundaries** (`app/src/components/ErrorBoundary.tsx`):
+   - Error catching and fallback rendering
 
-## Recommendations
+5. **Helper Functions**:
+   - Balance formatting functions
+   - Time calculations (unlock times, epochs)
+   - Category detection (`detectCategory`)
 
-**Short-term (No Breaking Changes):**
-1. Add JSDoc comments to hooks documenting expected behavior
-2. Increase console logging coverage for critical paths
-3. Create manual test checklist for critical user flows
+**Suggested Test Framework Setup:**
 
-**Medium-term:**
-1. Set up Vitest with React Testing Library
-2. Write unit tests for hooks (especially useStakingInfo, useMarkets, useContract)
-3. Add integration tests for common user flows
+For this React + TypeScript + Vite project, recommended setup:
+- **Vitest** - Fast, Vite-native test runner
+- **@testing-library/react** - React component testing
+- **@testing-library/user-event** - User interaction simulation
+- **@vitest/ui** - Visual test UI
 
-**Long-term:**
-1. Implement E2E tests with Playwright or Cypress
-2. Add visual regression testing
-3. Set up CI/CD with test execution gates
+**Mock Requirements:**
+
+If testing were implemented, these would need mocking:
+- `@tonconnect/ui-react` hooks (`useTonWallet`, `useTonAddress`, `useTonConnectUI`)
+- `fetch` API calls to TonAPI
+- `@ton/core` utilities (`Address`, `Cell`)
+- Supabase client (`@supabase/supabase-js`)
+- Local storage access
+- Browser APIs (Buffer polyfill)
+
+## Current Quality Assurance
+
+**Without automated tests, quality is maintained through:**
+
+1. **TypeScript** (though strict mode is disabled)
+2. **ESLint** with React and TypeScript rules
+3. **Error Boundaries** for runtime error isolation
+4. **Console Logging** for debugging and tracing
+5. **Manual Testing** on testnet and mainnet
+
+**Code Review Checkpoints:**
+
+When adding new code, verify:
+- Error handling with try-catch blocks
+- Loading and error states in hooks
+- Address format conversion for blockchain calls
+- Rate limiting compliance for API calls
+- Network-specific configuration usage
+- Component lazy loading and error boundaries
 
 ---
 
-*Testing analysis: 2026-02-01*
+*Testing analysis: 2026-02-05*

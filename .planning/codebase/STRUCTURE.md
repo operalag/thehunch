@@ -1,287 +1,234 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-02-01
+**Analysis Date:** 2026-02-05
 
 ## Directory Layout
 
 ```
-/Users/tonicaradonna/thehunch-claude/
-├── src/                              # Marketing website frontend (Vite + React)
-│   ├── App.tsx                       # Main app component with router
-│   ├── main.tsx                      # Entry point
-│   ├── App.css                       # Global styles
-│   ├── index.css                     # CSS reset/Tailwind
-│   ├── pages/                        # Page components (route destinations)
-│   │   ├── Index.tsx                 # Landing page
-│   │   ├── Dashboard.tsx             # Demo dashboard redirect
-│   │   ├── FAQ.tsx                   # FAQ page
-│   │   ├── Whitepaper.tsx            # Whitepaper page
-│   │   ├── Membership.tsx            # Membership info
-│   │   ├── Staking.tsx               # Staking info page
-│   │   ├── CreateMarket.tsx          # Market creation (marketing info)
-│   │   ├── MarketDetails.tsx         # Market details view
-│   │   └── NotFound.tsx              # 404 page
-│   ├── components/                   # Reusable UI components
-│   │   ├── Hero.tsx                  # Landing hero section
-│   │   ├── Navigation.tsx            # Top navigation bar
-│   │   ├── Footer.tsx                # Footer
-│   │   ├── AboutSection.tsx          # About project section
-│   │   ├── HowItWorksSection.tsx     # How it works section
-│   │   ├── UseCasesSection.tsx       # Use cases section
-│   │   ├── StealthModeSection.tsx    # Privacy features section
-│   │   ├── CommunitySection.tsx      # Community section
-│   │   ├── FAQSection.tsx            # FAQ components
-│   │   ├── CountdownTimer.tsx        # Timer component
-│   │   ├── StatusBadge.tsx           # Status indicator component
-│   │   ├── TokenFlow.tsx             # Token flow visualization
-│   │   ├── WaitlistModal.tsx         # Waitlist signup modal
-│   │   ├── WalletConnect.tsx         # Wallet connection UI
-│   │   └── ui/                       # shadcn/Radix UI primitives (generated)
-│   │       ├── button.tsx            # Button component
-│   │       ├── card.tsx              # Card component
-│   │       ├── tabs.tsx              # Tabs component
-│   │       ├── dialog.tsx            # Modal/Dialog
-│   │       └── [50+ more UI primitives]
-│   ├── store/                        # State management
-│   │   └── blockchainStore.ts        # Zustand store (legacy mock data)
-│   ├── lib/                          # Utility functions
-│   │   └── utils.ts                  # Helper functions (classname merging)
-│   ├── hooks/                        # Custom React hooks (not in use in src/)
-│   ├── assets/                       # Static assets
-│   │   └── [images, icons]
-│
-├── app/                              # Production application frontend
-│   ├── src/
-│   │   ├── App.tsx                   # Main app component (lazy loads sections)
-│   │   ├── main.tsx                  # Entry point (polyfills, TonConnect)
-│   │   ├── App.css                   # Global app styles
-│   │   ├── index.css                 # CSS reset
-│   │   ├── polyfills.ts              # TON SDK polyfills
-│   │   ├── vite-env.d.ts             # Vite environment type definitions
-│   │   ├── config/                   # Configuration files
-│   │   │   ├── contracts.ts          # Contract addresses (testnet/mainnet) with getters
-│   │   │   ├── networks.ts           # Network configuration (testnet/mainnet URLs, chain IDs)
-│   │   │   └── supabase.ts           # Supabase client, cache functions, database types
-│   │   ├── components/               # React components
-│   │   │   ├── Header.tsx            # Top navigation (network switcher, wallet)
-│   │   │   ├── Dashboard.tsx         # Wallet info and balance display
-│   │   │   ├── Markets.tsx           # Market list with filtering, sorting, bond history
-│   │   │   ├── MarketsSimple.tsx     # Simplified market view (fallback)
-│   │   │   ├── Stake.tsx             # Staking UI
-│   │   │   ├── Stats.tsx             # Protocol statistics (complex version)
-│   │   │   ├── StatsSimple.tsx       # Protocol statistics (simplified/crash-proof)
-│   │   │   ├── TokenFlow.tsx         # Token flow visualization
-│   │   │   ├── TokenFlow.css         # TokenFlow styles
-│   │   │   ├── NetworkIndicator.tsx  # Network status display
-│   │   │   ├── NetworkSwitcher.tsx   # Testnet/Mainnet selector
-│   │   │   └── ErrorBoundary.tsx     # Error boundary component
-│   │   ├── hooks/                    # Custom React hooks
-│   │   │   ├── useMarkets.ts         # Fetch all markets from blockchain (raw)
-│   │   │   ├── useMarketsCache.ts    # Fetch markets from Supabase or hardcoded V6.3 testnet data
-│   │   │   ├── useContract.ts        # Send transactions (stake, propose, challenge, etc.)
-│   │   │   ├── useJettonBalance.ts   # Fetch user HNCH and TON balances
-│   │   │   ├── useStakingInfo.ts     # Fetch user staking info (staked balance, rewards)
-│   │   │   ├── useMarketParticipants.ts # Fetch market history (proposals/challenges)
-│   │   │   └── useMasterOracleBalance.ts # Monitor MASTER_ORACLE balance (required for operations)
-│   │   ├── assets/                   # Static assets
-│   │   │   └── react.svg             # React logo
-│   │   └── index.css                 # CSS entry point
-│   ├── supabase/                     # Supabase project files
-│   │   ├── functions/                # Edge functions
-│   │   │   └── sync-markets/         # Serverless function to sync markets
-│   │   └── migrations/               # Database migrations
-│   └── public/                       # Public assets
-│       └── tonconnect-manifest.json  # TonConnect manifest
-│
-├── public/                           # Root public assets
-│   ├── tonconnect-manifest.json      # TonConnect manifest
-│   └── [other assets]
-│
-├── .planning/                        # GSD planning documents
-│   └── codebase/                     # Architecture analysis (this directory)
-│       ├── ARCHITECTURE.md
-│       ├── STRUCTURE.md
-│       ├── STACK.md
-│       ├── CONVENTIONS.md
-│       ├── TESTING.md
-│       ├── CONCERNS.md
-│       └── INTEGRATIONS.md
-│
-├── vite.config.ts                    # Vite build configuration (src/)
-├── tsconfig.json                     # TypeScript configuration (root)
-├── tsconfig.app.json                 # TypeScript app config (src/)
-├── tsconfig.node.json                # TypeScript node config (build tools)
-├── package.json                      # Root dependencies (src/ project)
-├── package-lock.json                 # Dependency lock (src/)
-├── bun.lockb                         # Bun lock file (optional)
-├── tailwind.config.ts                # Tailwind CSS configuration
-├── postcss.config.js                 # PostCSS configuration
-├── eslint.config.js                  # ESLint configuration
-├── components.json                   # shadcn/ui configuration
-├── index.html                        # Root HTML entry (src/)
-├── README.md                         # Project README
-└── app/                              # app/ has separate package.json and build
-    ├── package.json                  # app/ dependencies
-    ├── vite.config.ts                # Vite config for app/
-    ├── tsconfig.json                 # TypeScript config for app/
-    └── index.html                    # app/ HTML entry
+thehunch-claude/
+├── app/                    # Blockchain dApp (production app)
+│   ├── src/               # dApp source code
+│   ├── supabase/          # Database migrations and edge functions
+│   ├── docs/              # dApp-specific documentation
+│   └── public/            # dApp static assets
+├── src/                   # Landing site source code
+├── public/                # Landing site static assets
+├── .planning/             # GSD planning documents
+│   └── codebase/          # Codebase analysis documents
+├── dist/                  # Build output (generated)
+└── node_modules/          # Dependencies (generated)
 ```
 
 ## Directory Purposes
 
-**`src/` (Marketing Website):**
-- Purpose: Landing page, marketing content, educational pages
-- Contains: Page components, section components, UI library, legacy Zustand store
-- Key files: `pages/Index.tsx` (landing), `components/Hero.tsx`, `components/Navigation.tsx`
+**`/app`:**
+- Purpose: Complete blockchain dApp for interacting with HUNCH prediction markets
+- Contains: Full React application with TON integration, contract hooks, caching layer
+- Key files: `/app/src/App.tsx` (entry), `/app/src/hooks/useContract.ts` (blockchain interactions), `/app/src/config/networks.ts` (network config)
 
-**`src/pages/`:**
-- Purpose: Route-level page components (destinations for router)
-- Contains: Full-page layouts
-- Key files: `Index.tsx` (landing), `FAQ.tsx`, `Whitepaper.tsx`, `Staking.tsx`
+**`/app/src`:**
+- Purpose: dApp source code
+- Contains: Components, hooks, configuration, TypeScript sources
+- Key files: `App.tsx`, `main.tsx`, `App.css`
 
-**`src/components/`:**
-- Purpose: Reusable UI components and sections
-- Contains: Feature sections, UI primitives, marketing components
-- Key files: `Hero.tsx`, `Navigation.tsx`, `Footer.tsx`, `ui/` (shadcn primitives)
+**`/app/src/components`:**
+- Purpose: dApp UI components
+- Contains: `Dashboard.tsx`, `Markets.tsx`, `Stake.tsx`, `Stats.tsx`, `TokenFlow.tsx`, `Header.tsx`, `ErrorBoundary.tsx`
+- Key files: `Markets.tsx` (2,957 lines - main market interaction UI), `Stake.tsx` (staking interface)
 
-**`src/store/`:**
-- Purpose: Global application state (legacy)
+**`/app/src/hooks`:**
+- Purpose: Custom React hooks for blockchain data and interactions
+- Contains: Contract interaction, market fetching, balance queries, caching logic
+- Key files: `useContract.ts` (transaction builder), `useMarkets.ts` (blockchain queries), `useMarketsCache.ts` (Supabase cache), `useStakingInfo.ts`, `useJettonBalance.ts`, `useMasterOracleBalance.ts`, `useMarketParticipants.ts`
+
+**`/app/src/config`:**
+- Purpose: Environment and network configuration
+- Contains: Network settings, contract addresses, Supabase client
+- Key files: `networks.ts` (testnet/mainnet config), `contracts.ts` (contract addresses), `supabase.ts` (caching config)
+
+**`/app/supabase`:**
+- Purpose: Database schema and serverless functions
+- Contains: SQL migrations, Edge Functions for market cache refresh
+- Key files: `migrations/` (database schema), `functions/sync-markets/` (cache refresh function)
+
+**`/app/docs`:**
+- Purpose: Technical documentation for dApp
+- Contains: Implementation guides, test plans, deployment docs
+- Key files: `IMPLEMENTATION_SUMMARY.md`, `TEST_PLAN.md`, `DEPLOYMENT.md`, `QUICKSTART.md`
+
+**`/src`:**
+- Purpose: Landing site source code (marketing/demo site)
+- Contains: Landing pages, marketing components, mock blockchain store
+- Key files: `App.tsx` (router setup), `main.tsx` (entry point)
+
+**`/src/pages`:**
+- Purpose: Landing site page components
+- Contains: Route-level components for each landing page
+- Key files: `Index.tsx`, `Dashboard.tsx`, `MarketDetails.tsx`, `CreateMarket.tsx`, `Staking.tsx`, `Membership.tsx`, `FAQ.tsx`, `Whitepaper.tsx`, `NotFound.tsx`
+
+**`/src/components`:**
+- Purpose: Landing site shared components
+- Contains: Navigation, Hero, sections, modals
+- Key files: `Navigation.tsx`, `Hero.tsx`, `WalletConnect.tsx`, `StealthModeSection.tsx`, `FAQSection.tsx`, `WaitlistModal.tsx`
+
+**`/src/components/ui`:**
+- Purpose: Reusable UI component library (shadcn/ui)
+- Contains: Button, Card, Dialog, Form elements, etc.
+- Key files: `button.tsx`, `card.tsx`, `dialog.tsx`, `input.tsx`, `select.tsx`, `tabs.tsx`, `toast.tsx`
+
+**`/src/store`:**
+- Purpose: State management for landing site
 - Contains: Zustand store with mock blockchain data
-- Key files: `blockchainStore.ts` (mock events, user state, mock transactions)
+- Key files: `blockchainStore.ts` (mock events, user state, actions)
 
-**`app/src/` (Production Application):**
-- Purpose: Main application for interacting with HUNCH Oracle contracts
-- Contains: Components, hooks, configuration for blockchain interaction
-- Key files: `App.tsx` (main layout), `components/Markets.tsx` (market list), `config/networks.ts`
+**`/src/hooks`:**
+- Purpose: Custom React hooks for landing site
+- Contains: UI helpers, toast management, Telegram integration
+- Key files: `use-toast.ts`, `use-mobile.tsx`, `useTelegram.tsx`
 
-**`app/src/config/`:**
-- Purpose: Centralized configuration for contracts, networks, and external services
-- Contains: Network-specific addresses, URLs, Supabase client
-- Key files: `networks.ts` (testnet/mainnet config), `contracts.ts` (contract getters), `supabase.ts` (cache client)
+**`/src/lib`:**
+- Purpose: Utility functions for landing site
+- Contains: Tailwind class merging utility
+- Key files: `utils.ts` (cn() function)
 
-**`app/src/components/`:**
-- Purpose: Interactive UI for blockchain interaction
-- Contains: Dashboard, markets list, staking, statistics, header/footer
-- Key files: `Markets.tsx` (largest component, ~100KB), `Dashboard.tsx`, `Stake.tsx`
+**`/src/assets`:**
+- Purpose: Images, videos, graphics for landing site
+- Contains: PNG images, GIF animations, MP4 video
+- Key files: `hunch-logo.png`, `hunch-icon.png`, `hero-animation.mp4`, `circuit-visual.png`, `platinum-pattern.gif`
 
-**`app/src/hooks/`:**
-- Purpose: Encapsulate blockchain and API logic
-- Contains: Custom React hooks for data fetching and transactions
-- Key files: `useMarkets.ts` (fetch from blockchain), `useMarketsCache.ts` (fetch from cache), `useContract.ts` (transactions), `useJettonBalance.ts` (user balance)
+**`/public`:**
+- Purpose: Static assets served directly
+- Contains: Favicon, manifest, static files for landing site
+- Key files: `tonconnect-manifest.json`
 
-**`app/supabase/`:**
-- Purpose: Supabase backend configuration
-- Contains: Edge functions, database migrations
-- Key files: `functions/sync-markets/` (syncs markets to cache), `migrations/` (database schema)
+**`/.planning`:**
+- Purpose: GSD planning and analysis documents
+- Contains: Codebase analysis, implementation plans
+- Key files: `HEDERA_PORTING_GUIDE.md`, `codebase/` (this directory)
 
-**`.planning/codebase/`:**
-- Purpose: Generated architecture and analysis documents
-- Contains: ARCHITECTURE.md, STRUCTURE.md, STACK.md, CONVENTIONS.md, TESTING.md, CONCERNS.md, INTEGRATIONS.md
-- Auto-generated by GSD mapping commands
+**`/.planning/codebase`:**
+- Purpose: Codebase analysis documents for GSD commands
+- Contains: Architecture, structure, stack, conventions, etc.
+- Key files: `ARCHITECTURE.md`, `STRUCTURE.md` (this document)
 
 ## Key File Locations
 
 **Entry Points:**
-- `src/main.tsx`: Marketing site entry (React, TonConnect provider)
-- `src/index.html`: Root HTML for marketing site
-- `app/src/main.tsx`: App entry (polyfills, TonConnect provider)
-- `app/index.html`: Root HTML for app
-- `src/App.tsx`: Marketing site router and layout
-- `app/src/App.tsx`: App main layout (lazy-loaded sections)
+- `/src/main.tsx`: Landing site entry point (React 18, TonConnect wrapper)
+- `/app/src/main.tsx`: dApp entry point (React 19, TonConnect wrapper)
+- `/index.html`: Root HTML for landing site
+- `/app/index.html`: Root HTML for dApp
 
 **Configuration:**
-- `app/src/config/networks.ts`: Testnet/mainnet URLs, contract addresses, chain IDs
-- `app/src/config/contracts.ts`: Contract addresses with getters for network switching
-- `app/src/config/supabase.ts`: Supabase client, cache functions, database types
-- `vite.config.ts`: Vite build config (marketing site)
-- `app/vite.config.ts`: Vite build config (app)
-- `tailwind.config.ts`: Tailwind CSS theme configuration
-- `components.json`: shadcn/ui configuration (generated)
+- `/vite.config.ts`: Vite config for landing site (port 8080, @ alias to /src)
+- `/app/vite.config.ts`: Vite config for dApp
+- `/tsconfig.json`: TypeScript config (references app and node configs)
+- `/tsconfig.app.json`: App-specific TypeScript settings
+- `/tailwind.config.ts`: Tailwind CSS configuration
+- `/postcss.config.js`: PostCSS configuration
+- `/eslint.config.js`: ESLint configuration (both apps)
+- `/components.json`: shadcn/ui configuration
 
 **Core Logic:**
-- `app/src/hooks/useMarkets.ts`: Fetch markets from TON blockchain via TonAPI
-- `app/src/hooks/useMarketsCache.ts`: Fetch markets from Supabase cache (fast) or hardcoded testnet data
-- `app/src/hooks/useContract.ts`: Send transactions (stake, propose, challenge, etc.) via TonConnect
-- `app/src/hooks/useJettonBalance.ts`: Fetch user HNCH token balance via TonAPI
-- `app/src/hooks/useStakingInfo.ts`: Fetch user staking data from MASTER_ORACLE contract
-- `src/store/blockchainStore.ts`: Zustand mock store (legacy, used in old pages)
+- `/app/src/hooks/useContract.ts`: All blockchain transaction logic (create market, stake, propose, challenge, settle)
+- `/app/src/hooks/useMarkets.ts`: Direct blockchain market queries via TonAPI
+- `/app/src/hooks/useMarketsCache.ts`: Supabase-cached market data
+- `/app/src/config/networks.ts`: Network configuration and switching
+- `/src/store/blockchainStore.ts`: Mock blockchain state for landing site demo
 
 **Testing:**
-- No test files found (tests not yet implemented)
+- No test files detected in current structure
+- Test configuration files: `jest.config.*`, `vitest.config.*` not present
 
 ## Naming Conventions
 
 **Files:**
-- Components: PascalCase (e.g., `Dashboard.tsx`, `Markets.tsx`, `ErrorBoundary.tsx`)
-- Hooks: camelCase with `use` prefix (e.g., `useMarkets.ts`, `useContract.ts`)
-- Utilities: camelCase (e.g., `utils.ts`)
-- Styles: Component name + `.css` (e.g., `TokenFlow.css`)
-- Config: camelCase (e.g., `networks.ts`, `contracts.ts`)
+- Components: PascalCase with .tsx extension (`Dashboard.tsx`, `Markets.tsx`, `WalletConnect.tsx`)
+- Hooks: camelCase with .ts/.tsx extension, prefixed with "use" (`useContract.ts`, `useMarkets.ts`)
+- Config: camelCase with .ts extension (`networks.ts`, `contracts.ts`, `supabase.ts`)
+- UI components: kebab-case with .tsx extension (`alert-dialog.tsx`, `scroll-area.tsx`)
+- Types: Defined in same file as implementation or in `.d.ts` files
+- Styles: Same name as component with .css extension (`App.css`, `TokenFlow.css`)
 
 **Directories:**
-- Component folders: lowercase (e.g., `components/`, `ui/`, `hooks/`)
-- Feature folders: lowercase (e.g., `config/`, `assets/`)
+- Lowercase with hyphens for multi-word names (not observed, mostly single words)
+- Lowercase single words: `src`, `hooks`, `components`, `config`, `assets`, `public`
+- Special: `ui` subdirectory for shadcn/ui components
 
 ## Where to Add New Code
 
-**New Feature:**
-- Primary code: `app/src/components/[FeatureName].tsx` (new component) + `app/src/hooks/use[Feature].ts` (new hook for data)
-- Tests: `app/src/components/[FeatureName].test.tsx` (when testing is set up)
-- Configuration: `app/src/config/[feature].ts` (if config needed)
+**New Blockchain Feature (dApp):**
+- Primary code: `/app/src/components/[FeatureName].tsx`
+- Contract interaction: Add methods to `/app/src/hooks/useContract.ts` or create new hook in `/app/src/hooks/use[Feature].ts`
+- Import and render in `/app/src/App.tsx` within an ErrorBoundary
+
+**New Landing Page:**
+- Primary code: `/src/pages/[PageName].tsx`
+- Add route to `/src/App.tsx` in the `<Routes>` component
+- Add navigation link in `/src/components/Navigation.tsx`
 
 **New Component/Module:**
-- Implementation: `app/src/components/[ComponentName].tsx` (if UI), or `app/src/hooks/use[HookName].ts` (if logic only)
-- Export from parent: Add import/export in `app/src/App.tsx` or parent component
+- Implementation: `/src/components/[ComponentName].tsx` (landing) or `/app/src/components/[ComponentName].tsx` (dApp)
+- Shared UI component: `/src/components/ui/[component-name].tsx` (follows shadcn/ui pattern)
 
 **Utilities:**
-- Shared helpers: `app/src/lib/` (create if not exists) or `src/lib/utils.ts` (for marketing site)
-- Hook utilities: `app/src/hooks/` (if used by multiple hooks)
+- Shared helpers: `/src/lib/utils.ts` (landing) or create `/app/src/lib/utils.ts` (dApp)
+- Blockchain utilities: Add to `/app/src/hooks/useContract.ts` or create specialized utility file in `/app/src/lib/`
 
-**Configuration/Constants:**
-- Network/contract config: `app/src/config/networks.ts` or `app/src/config/contracts.ts`
-- Supabase queries: `app/src/config/supabase.ts` (or new `app/src/lib/cache.ts`)
-- UI theme: `tailwind.config.ts`
+**New Hook:**
+- Landing site: `/src/hooks/use[HookName].tsx`
+- dApp: `/app/src/hooks/use[HookName].ts` (blockchain-related hooks use .ts, UI hooks can use .tsx)
 
-**Pages (Marketing Site):**
-- New marketing page: `src/pages/[PageName].tsx` + add route to `src/App.tsx`
+**Configuration:**
+- Network settings: `/app/src/config/networks.ts` (add to TESTNET_CONFIG or MAINNET_CONFIG)
+- Contract addresses: `/app/src/config/contracts.ts` (update CONTRACTS object)
+- Environment variables: `/app/.env.local` (not committed), documented in `/app/.env.example`
+
+**Database Schema:**
+- Supabase migrations: `/app/supabase/migrations/[timestamp]_[description].sql`
+- Edge functions: `/app/supabase/functions/[function-name]/index.ts`
+
+**Assets:**
+- Images/media: `/src/assets/[filename]` (landing) or `/app/src/assets/[filename]` (dApp)
+- Static files: `/public/[filename]` (landing) or `/app/public/[filename]` (dApp)
 
 ## Special Directories
 
-**`node_modules/`:**
-- Purpose: Third-party dependencies
-- Generated: Yes (via npm/bun install)
-- Committed: No (git-ignored)
+**`/node_modules`:**
+- Purpose: NPM dependencies
+- Generated: Yes (via npm install)
+- Committed: No (in .gitignore)
 
-**`.git/`:**
-- Purpose: Git repository metadata
-- Generated: Yes
-- Committed: N/A (internal to git)
+**`/dist`:**
+- Purpose: Production build output
+- Generated: Yes (via npm run build)
+- Committed: No (in .gitignore)
 
-**`dist/`:**
-- Purpose: Build output (compiled JavaScript/CSS)
-- Generated: Yes (via `vite build`)
-- Committed: No (git-ignored)
+**`/app/node_modules`:**
+- Purpose: dApp-specific dependencies
+- Generated: Yes (via npm install in /app directory)
+- Committed: No (in .gitignore)
 
-**`.claude/`:**
-- Purpose: Claude IDE configuration
-- Generated: Yes (by Claude IDE)
-- Committed: No (git-ignored)
+**`/.vercel` and `/app/.vercel`:**
+- Purpose: Vercel deployment configuration
+- Generated: Yes (by Vercel CLI)
+- Committed: No (in .gitignore)
 
-**`.planning/codebase/`:**
-- Purpose: Architecture analysis documents
-- Generated: Yes (by GSD mapping commands)
-- Committed: Yes (checked into repo)
+**`/.planning/codebase`:**
+- Purpose: Codebase analysis documents for GSD system
+- Generated: Yes (by GSD map-codebase command)
+- Committed: Yes (helps future Claude instances understand the codebase)
 
-**`app/node_modules/`:**
-- Purpose: app/ dependencies (separate from root)
-- Generated: Yes
-- Committed: No
+**`/.claude`:**
+- Purpose: Claude Desktop configuration
+- Generated: No (manually created)
+- Committed: Depends on project settings
 
-**`app/supabase/`:**
-- Purpose: Supabase project definition
-- Generated: No (manually created and maintained)
-- Committed: Yes (supabase CLI project)
+**`/.git`:**
+- Purpose: Git version control metadata
+- Generated: Yes (by git init)
+- Committed: No (never committed)
 
 ---
 
-*Structure analysis: 2026-02-01*
+*Structure analysis: 2026-02-05*

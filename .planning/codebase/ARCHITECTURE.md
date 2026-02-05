@@ -1,194 +1,182 @@
 # Architecture
 
-**Analysis Date:** 2026-02-01
+**Analysis Date:** 2026-02-05
 
 ## Pattern Overview
 
-**Overall:** Decentralized prediction market platform with layered frontend architecture using React + Vite.
+**Overall:** Dual-Application Frontend Architecture
 
 **Key Characteristics:**
-- Dual-application structure: marketing frontend (`/src`) and production app (`/app/src`)
-- TON blockchain integration for smart contract interactions
-- Supabase caching layer for market data optimization
-- Component-driven UI with Radix UI/shadcn primitive library
-- State management via Zustand and React hooks
-- Network-aware configuration (testnet/mainnet switching)
+- Two separate React applications sharing design system but serving different purposes
+- Marketing/landing site (`/src`) with client-side routing
+- Blockchain dApp (`/app/src`) with TON blockchain integration
+- State management via Zustand for mock data (landing) and React hooks for blockchain data (dApp)
+- External data caching via Supabase for blockchain market data
 
 ## Layers
 
-**Presentation Layer (Components):**
-- Purpose: Render UI and handle user interactions
-- Location: `/src/components/`, `/src/pages/`, `/app/src/components/`
-- Contains: React components (`.tsx`), UI primitives, feature sections
-- Depends on: hooks, store, utils
-- Used by: React Router pages in `/src/pages/`
+**Presentation Layer (Landing Site):**
+- Purpose: Marketing and user acquisition
+- Location: `/src`
+- Contains: Page components, UI components from shadcn/ui, hero sections, FAQ
+- Depends on: React Router DOM, Framer Motion for animations, TonConnect for wallet preview
+- Used by: Public visitors, potential users
 
-**Data Management Layer (Hooks):**
-- Purpose: Encapsulate blockchain and API logic; fetch/cache market and user data
-- Location: `/app/src/hooks/`
-- Contains: Custom React hooks (`useMarkets`, `useContract`, `useJettonBalance`, `useStakingInfo`, `useMarketsCache`)
-- Depends on: config (contracts, networks), Supabase client, TonConnect, @ton libraries
-- Used by: Components requiring blockchain state
+**Presentation Layer (dApp):**
+- Purpose: Blockchain interaction and prediction market management
+- Location: `/app/src`
+- Contains: Dashboard, Markets, Staking interfaces, blockchain transaction components
+- Depends on: TON SDK, TonConnect, custom hooks for contract interaction
+- Used by: Connected wallet users
+
+**Business Logic Layer (dApp):**
+- Purpose: Encapsulate blockchain interactions and data fetching
+- Location: `/app/src/hooks`
+- Contains: `useContract.ts`, `useMarkets.ts`, `useStakingInfo.ts`, `useJettonBalance.ts`
+- Depends on: TON libraries (`@ton/core`, `@ton/ton`), TonConnect, network configuration
+- Used by: Presentation components
+
+**State Management Layer (Landing):**
+- Purpose: Mock blockchain state for demonstration
+- Location: `/src/store/blockchainStore.ts`
+- Contains: Zustand store with mock events, user state, protocol revenue
+- Depends on: Zustand with persist middleware
+- Used by: Landing site pages and components
 
 **Configuration Layer:**
-- Purpose: Centralize environment setup and network-specific values
-- Location: `/app/src/config/`
-- Contains: `contracts.ts` (contract addresses with getters), `networks.ts` (testnet/mainnet config), `supabase.ts` (Supabase client and cache functions)
-- Depends on: environment variables
-- Used by: hooks and components
+- Purpose: Environment-specific settings and contract addresses
+- Location: `/app/src/config`
+- Contains: `networks.ts`, `contracts.ts`, `supabase.ts`
+- Depends on: Environment variables, localStorage for network selection
+- Used by: All blockchain interaction hooks
 
-**State Management Layer:**
-- Purpose: Global application state for older mock data flow
-- Location: `/src/store/blockchainStore.ts`
-- Contains: Zustand store with `useBlockchainStore` hook
-- Depends on: none (mock data)
-- Used by: Legacy pages that still reference blockchain state
+**Data Caching Layer:**
+- Purpose: Improve performance by caching blockchain market data
+- Location: Supabase (external), accessed via `/app/src/config/supabase.ts` and `/app/src/hooks/useMarketsCache.ts`
+- Contains: Market metadata, status, cached blockchain state
+- Depends on: Supabase client SDK
+- Used by: Market display components
 
-**Styling:**
-- Purpose: Application appearance and theme
-- Location: `/src/index.css`, `/src/App.css`, `/app/src/index.css`, `/app/src/App.css`, `/app/src/components/TokenFlow.css`
-- Contains: Global styles, component scoped styles, Tailwind configuration
-- Applied via: Tailwind CSS + custom CSS
+**UI Component Library:**
+- Purpose: Reusable design system components
+- Location: `/src/components/ui` (landing), shared design tokens
+- Contains: shadcn/ui components (Button, Card, Dialog, Form elements)
+- Depends on: Radix UI primitives, Tailwind CSS
+- Used by: Both landing and dApp presentation layers
 
 ## Data Flow
 
-**Market Data Fetch Flow (Primary):**
+**Wallet Connection Flow:**
 
-1. Component renders (e.g., `Markets.tsx`)
-2. Component calls `useMarketsCache()` or `useMarkets()` hook
-3. Hook checks Supabase cache first (via `supabase.ts`)
-4. If cached data available and fresh: return cached data
-5. If no cache: fetch from TON blockchain via TonAPI (`getNetworkConfig().tonapiUrl`)
-6. Hook performs rate-limited batch requests (2 req/sec free tier, 10 with API key) via `fetchInBatches()`
-7. Results returned to component; component updates UI
-8. Optional: Write to Supabase cache for next load
-
-**User Wallet Flow:**
-
-1. User clicks wallet connect in Header
-2. TonConnect UI prompt opens (TonConnectUIProvider wrapper)
-3. User selects wallet (TonKeeper, etc.)
-4. `useTonWallet()` and `useTonAddress()` hooks update in components
-5. Dashboard renders with wallet address via `useTonAddress()`
-6. useJettonBalance fetches HNCH tokens for connected address
-7. Components display balance and enable transaction buttons
-
-**Transaction Flow:**
-
-1. User initiates action (stake, propose, challenge)
-2. Component calls `useContract()` hook function (e.g., `stake()`, `proposeOutcome()`)
-3. Hook builds TON message body with operation code (OP_CODES) and parameters
-4. Hook sends via TonConnect (`tonConnectUI.sendTransaction()`)
-5. User confirms in wallet UI
-6. Transaction broadcasts to network
-7. Hook optionally updates cache via `updateMarketInCache()`
+1. User clicks "Connect Wallet" in Header (`/app/src/components/Header.tsx`)
+2. TonConnect UI modal opens (via `@tonconnect/ui-react`)
+3. User selects wallet and approves connection
+4. `useTonWallet()` and `useTonAddress()` hooks receive wallet data
+5. All contract interaction hooks now have access to user address
 
 **Market Creation Flow:**
 
-1. User accesses `/app/create` page (in marketing site) or CreateMarket component
-2. User fills market form (question, outcomes, resolution deadline, category)
-3. Form submits to `stake()` or market creation hook
-4. Hook creates transaction with MARKET_CREATION_FEE deducted
-5. On success: market inserted into Supabase cache via `insertMarketToCache()`
-6. Markets list refreshes showing new market
+1. User fills form in Markets component (`/app/src/components/Markets.tsx`)
+2. Component calls `createMarket()` from `useContract()` hook
+3. Hook constructs cell payload with OP_CODE (0x01), question, rules, deadline
+4. Jetton transfer transaction sent to Master Oracle contract
+5. Transaction confirmed on TON blockchain
+6. Market data cached to Supabase via `insertMarketToCache()` (`/app/src/config/supabase.ts`)
+7. Cache refresh triggered, UI updates with new market
+
+**Market Display Flow (with Cache):**
+
+1. `Markets` component uses `useMarketsCache()` hook
+2. Hook fetches from Supabase: `SELECT * FROM markets WHERE network = ?`
+3. Cache returns array of `MarketRow` objects with pre-fetched blockchain state
+4. For fresh data, hook can optionally query blockchain directly via `useMarkets()`
+5. Component renders market cards with cached data
+6. Background refresh updates cache periodically
+
+**Staking Flow:**
+
+1. User enters amount in Stake component (`/app/src/components/Stake.tsx`)
+2. Component calls `stake(amount)` from `useContract()` hook
+3. Hook gets user's jetton wallet address via TonAPI
+4. Constructs jetton transfer with forward_payload containing stake OP_CODE (0x03)
+5. Transaction routes: User Jetton Wallet → Master Oracle → Fee Distributor
+6. `useStakingInfo()` hook polls blockchain for updated staked balance
+7. UI updates with new stake amount and rewards
 
 **State Management:**
 
-- **User State:** TonConnect wallet connection (via hooks `useTonWallet()`, `useTonAddress()`)
-- **Market State:** Fetched from blockchain (via hooks) or Supabase cache (fallback/optimization)
-- **Network State:** Read from `localStorage` at app load (in `networks.ts::getCurrentNetwork()`)
-- **Legacy Mock State:** Zustand store in `/src/store/blockchainStore.ts` (used only in legacy pages)
+- Landing site: Zustand store with persist middleware to localStorage
+- dApp: No global state, uses React Query pattern via hooks that fetch blockchain state
+- Network selection: localStorage (`ton-network` key) via `getCurrentNetwork()` in `networks.ts`
 
 ## Key Abstractions
 
-**Custom Hooks:**
-- Purpose: Encapsulate blockchain/API logic; provide React state and lifecycle
-- Examples: `useMarkets` (fetch markets with caching), `useContract` (send transactions), `useJettonBalance` (fetch token balance), `useStakingInfo` (fetch user stake)
-- Pattern: Use React hooks (`useState`, `useEffect`, `useCallback`) to manage async data and error states
+**Contract Interaction (useContract):**
+- Purpose: Encapsulates all blockchain transaction logic
+- Examples: `/app/src/hooks/useContract.ts`
+- Pattern: Hook returns functions (createMarket, stake, propose, challenge) that construct TON cells and send transactions via TonConnect
 
-**Configuration Getters:**
-- Purpose: Provide fresh network/contract values at runtime (avoid module caching issues)
-- Examples: `CONTRACTS.MASTER_ORACLE` (getter), `getNetworkConfig()` (getter), `CURRENT_NETWORK` (constant)
-- Pattern: Use getter functions and export constants evaluated at module load
+**Market Data Fetching (useMarkets / useMarketsCache):**
+- Purpose: Abstract blockchain querying and caching logic
+- Examples: `/app/src/hooks/useMarkets.ts`, `/app/src/hooks/useMarketsCache.ts`
+- Pattern: Hooks expose market arrays, loading states, and refresh functions; internally manage TonAPI calls and Supabase queries
 
-**Supabase Cache Layer:**
-- Purpose: Reduce blockchain API calls by caching market data
-- Examples: `insertMarketToCache()`, `updateMarketInCache()`, `supabase` client
-- Pattern: Optional cache (graceful degradation if Supabase unavailable)
+**Network Configuration:**
+- Purpose: Single source of truth for testnet/mainnet settings
+- Examples: `/app/src/config/networks.ts`
+- Pattern: Getter functions (`getNetworkConfig()`) return network-specific contract addresses and API endpoints based on localStorage selection
 
-**TonConnect Integration:**
-- Purpose: Wrap app in TonConnectUIProvider; enable wallet connection via hooks
-- Examples: `useTonWallet()`, `useTonAddress()`, `useTonConnectUI()`
-- Pattern: Provider pattern in `main.tsx`; hooks in components
-
-**Rate Limiting & Batching:**
-- Purpose: Handle TonAPI free tier limits (~1 req/sec) and prevent rate limiting
-- Examples: `fetchInBatches()`, `fetchWithRetry()`, batch size of 2 (free) or 10 (with key)
-- Pattern: Queue requests in batches; exponential backoff on 429 errors
+**Blockchain Store (Mock):**
+- Purpose: Simulate blockchain state for landing site demo
+- Examples: `/src/store/blockchainStore.ts`
+- Pattern: Zustand store with actions that mimic contract operations with setTimeout delays
 
 ## Entry Points
 
-**Marketing Site Entry (`src/main.tsx`):**
-- Location: `/Users/tonicaradonna/thehunch-claude/src/main.tsx`
-- Triggers: Browser loads root URL
-- Responsibilities: Render App with React Router, TonConnect provider
+**Landing Site:**
+- Location: `/src/main.tsx`
+- Triggers: Browser navigation to `/`
+- Responsibilities: Renders React app with TonConnectUIProvider, initializes React Router with landing pages (Index, FAQ, Whitepaper, etc.)
 
-**Application Entry (`app/src/main.tsx`):**
-- Location: `/Users/tonicaradonna/thehunch-claude/app/src/main.tsx`
-- Triggers: Browser loads `/app/*` routes
-- Responsibilities: Import polyfills, render App with TonConnect provider, StrictMode for dev
+**dApp:**
+- Location: `/app/src/main.tsx`
+- Triggers: Direct navigation or build target
+- Responsibilities: Renders App component with TonConnect provider, initializes error boundaries and lazy-loaded sections
 
-**App Router (`src/App.tsx`):**
-- Location: `/Users/tonicaradonna/thehunch-claude/src/App.tsx`
-- Triggers: On component mount
-- Responsibilities: Define routes (marketing pages + app dashboard), wrap with providers (QueryClient, TooltipProvider)
+**Vite Dev Server:**
+- Location: Root `vite.config.ts` and `/app/vite.config.ts`
+- Triggers: `npm run dev` command
+- Responsibilities: Hot module replacement, path alias resolution (`@/*`), SWC compilation
 
-**App Component (`app/src/App.tsx`):**
-- Location: `/Users/tonicaradonna/thehunch-claude/app/src/App.tsx`
-- Triggers: On component mount after TonConnect provider
-- Responsibilities: Lazy-load heavy components (Dashboard, Stake, TokenFlow, Markets); wrap with ErrorBoundary and Suspense; display network indicator
+**Landing App Component:**
+- Location: `/src/App.tsx`
+- Triggers: After main.tsx renders
+- Responsibilities: Sets up routing (BrowserRouter), provides QueryClient and TooltipProvider context, defines route structure
+
+**dApp App Component:**
+- Location: `/app/src/App.tsx`
+- Triggers: After main.tsx renders
+- Responsibilities: Renders Header, lazy-loads Dashboard/Markets/Stake/TokenFlow with error boundaries, displays network indicator
 
 ## Error Handling
 
-**Strategy:** Component-level error boundaries + try-catch in hooks + API request retry logic
+**Strategy:** Error Boundaries with Graceful Degradation
 
 **Patterns:**
-
-- **Error Boundary:** `<ErrorBoundary>` component catches React render errors; displays fallback UI
-- **Async Errors:** Hooks use `try-catch` in `useEffect` or async functions; set error state on failure
-- **API Retry:** `fetchWithRetry()` in useMarkets implements exponential backoff (1s, 2s, 4s) up to 3 retries
-- **Rate Limit Handling:** 429 responses trigger retry with doubled delay
-- **Graceful Degradation:** If Supabase unavailable, fetch from blockchain instead; if API key missing, use conservative rate limits
-
-**Example:** In `Markets.tsx`, failed dashboard load shows `<ErrorFallback>` UI without crashing the page
+- dApp uses React Error Boundaries (`/app/src/components/ErrorBoundary.tsx`) around each major section
+- Sections fail independently without crashing entire app
+- Contract hooks return `{ error: string | null }` in result objects
+- Transaction failures caught with try/catch, displayed via toast notifications
+- Network errors handled by falling back from cache to direct blockchain queries
 
 ## Cross-Cutting Concerns
 
-**Logging:**
-- Approach: `console.log()`, `console.error()` throughout codebase
-- Examples: `[Markets]` prefix in useMarkets, `[getJettonWallet]` prefix in useContract
-- Pattern: Prefix logs with component/function name for debugging
+**Logging:** Console logging for development (`console.log`, `console.error`); hooks prefix logs with `[hookName]` for debugging (e.g., `[getJettonWallet]`)
 
-**Validation:**
-- Approach: Zod schemas (imported but not extensively used in core logic)
-- Pattern: Validate user input in forms; validate API responses before use
-- Examples: Network config validates contract addresses are strings
+**Validation:** Form validation in landing site uses React Hook Form + Zod schemas; dApp validates transaction parameters (min bond, address format) in hooks before sending
 
-**Authentication:**
-- Approach: TonConnect wallet connection (no centralized auth server)
-- Pattern: User identity = TON wallet address; checked via `useTonWallet()` and `useTonAddress()`
-- Examples: Dashboard shows "Connect wallet" prompt if no address
-
-**Network Awareness:**
-- Approach: Configuration layer switches contracts/URLs based on network
-- Pattern: `getCurrentNetwork()` reads from localStorage; `getNetworkConfig()` returns network-specific values
-- Examples: Testnet uses `TESTNET_CONFIG.contracts.MASTER_ORACLE`; mainnet uses `MAINNET_CONFIG.contracts.MASTER_ORACLE`
-
-**Caching:**
-- Approach: Supabase for market data; React hooks for component state
-- Pattern: Cache on insert/update; optional (graceful degradation)
-- Examples: Markets cache fetched once, updated on market changes
+**Authentication:** TonConnect handles wallet connection and signing; no traditional auth system; user identity is TON wallet address
 
 ---
 
-*Architecture analysis: 2026-02-01*
+*Architecture analysis: 2026-02-05*

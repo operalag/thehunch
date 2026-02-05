@@ -1,294 +1,218 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-02-01
+**Analysis Date:** 2026-02-05
 
 ## Naming Patterns
 
 **Files:**
-- React components: PascalCase (e.g., `Header.tsx`, `Markets.tsx`, `ErrorBoundary.tsx`)
-- Hooks: camelCase with `use` prefix (e.g., `useContract.ts`, `useStakingInfo.ts`, `useMarkets.ts`)
+- React components: PascalCase (e.g., `Dashboard.tsx`, `ErrorBoundary.tsx`, `Markets.tsx`)
+- Hooks: camelCase with `use` prefix (e.g., `useMarkets.ts`, `useStakingInfo.ts`, `useContract.ts`)
 - Config files: camelCase (e.g., `contracts.ts`, `networks.ts`, `supabase.ts`)
-- Utilities: camelCase (e.g., `polyfills.ts`)
+- Type definition files: kebab-case with `.d.ts` (e.g., `vite-env.d.ts`)
+- CSS files: Match component name (e.g., `TokenFlow.css` for `TokenFlow.tsx`)
 
 **Functions:**
-- React components: PascalCase (e.g., `function Header()`, `export function Stake()`)
-- Hook functions: camelCase starting with `use` (e.g., `export function useContract()`, `useStakingInfo()`)
-- Regular functions: camelCase (e.g., `fetchWithRetry()`, `formatBalance()`, `normalizeTonAddress()`)
-- Helper functions within components: camelCase (e.g., `formatCountdown()`, `ClaimInfoTooltip()` for nested components)
+- Component functions: PascalCase (e.g., `Dashboard()`, `ErrorBoundary()`)
+- Hook functions: camelCase with `use` prefix (e.g., `useMarkets()`, `useStakingInfo()`)
+- Helper functions: camelCase (e.g., `fetchMarkets()`, `formatBalance()`, `parseQuestionCell()`)
+- Event handlers: camelCase with `handle` prefix (e.g., `handleJoinClick()`)
 
 **Variables:**
-- Constants: UPPER_SNAKE_CASE for module-level constants (e.g., `LOCK_PERIOD_SECONDS`, `EPOCH_DURATION`, `MIN_BOND_HNCH`, `OP_CODES`)
-- State variables: camelCase (e.g., `isStaking`, `amount`, `lockTime`, `totalStaked`)
-- React props: camelCase (e.g., `name`, `address`, `fallback`, `onToggle`)
-- Callback props: camelCase with `on` prefix (e.g., `onToggle()`, `onProgress()`)
+- Constants (module-level): UPPER_SNAKE_CASE (e.g., `STATE_OPEN`, `BATCH_SIZE`, `API_DELAY_MS`)
+- React state: camelCase (e.g., `markets`, `loading`, `error`)
+- Config objects: camelCase or UPPER_SNAKE_CASE (e.g., `CONTRACTS`, `FEE_CONFIG`)
+- Local variables: camelCase (e.g., `address`, `totalStaked`, `userStake`)
 
 **Types:**
-- Interfaces: PascalCase with no `I` prefix (e.g., `interface StakingInfo`, `interface Market`, `interface Props`)
-- Types: PascalCase (e.g., `type NetworkType = 'testnet' | 'mainnet'`, `type StatusFilter = 'all' | 'open'`)
-- Type exports: Place at module level with `export interface` or `export type`
+- Interfaces: PascalCase (e.g., `Market`, `StakingInfo`, `UseMarketsResult`)
+- Type aliases: PascalCase (e.g., `MarketCategory`, `NetworkType`)
+- Enums: PascalCase with UPPER_SNAKE_CASE values
 
 ## Code Style
 
 **Formatting:**
-- Configured via ESLint with TypeScript support (ESLint 9.39.1)
-- Config file: `/Users/tonicaradonna/thehunch-claude/app/eslint.config.js`
-- Single quotes for strings (enforced by codebase convention, not prettier)
-- No explicit formatter configured; ESLint provides linting only
-- Line length: No strict limit enforced, but code generally stays under 100 characters
+- No Prettier config detected - relies on editor/IDE defaults
+- Indentation: 2 spaces (consistent across files)
+- Semicolons: Inconsistent - some files use them (`useMarkets.ts`), others don't (`App.tsx`)
+- String quotes: Single quotes preferred in `.tsx` files, both single and backticks in `.ts` files
+- Line length: No enforced limit, but long lines exist (e.g., 773 lines in `useMarkets.ts`)
 
 **Linting:**
-- ESLint with `@eslint/js` and `typescript-eslint` (v8.46.4)
-- React plugin: `eslint-plugin-react-hooks` (v7.0.1) for hook rules
-- React Refresh plugin: `eslint-plugin-react-refresh` (v0.4.24)
-- Config extends: JS recommended + TypeScript recommended + React hooks rules
-- React Refresh rule: Warns when exports are not component/hook definitions
-
-**Key Rules Enforced:**
-- No unused variables (TypeScript strict: `noUnusedLocals`, `noUnusedParameters`)
-- No fallthrough switch cases (`noFallthroughCasesInSwitch`)
-- Strict null checking (`strict: true`)
-- Requires explicit module detection (`moduleDetection: "force"`)
+- Tool: ESLint v9.32.0 with TypeScript ESLint v8.38.0
+- Config: `eslint.config.js` (flat config format)
+- Key rules:
+  - React Hooks rules enabled
+  - React Refresh warnings for component exports
+  - `@typescript-eslint/no-unused-vars` disabled
+  - Extends recommended configs from `@eslint/js` and `typescript-eslint`
 
 ## Import Organization
 
 **Order:**
-1. React/external libraries (`import { useState } from 'react'`)
-2. Third-party dependencies (`import { useTonWallet } from '@tonconnect/ui-react'`)
-3. Local modules (`import { useContract } from '../hooks/useContract'`)
-4. Relative imports (deep paths to components, hooks, config)
-5. CSS/assets (`import './App.css'`)
+1. External React imports (`import { useState, useEffect } from 'react'`)
+2. External library imports (`import { useTonWallet } from '@tonconnect/ui-react'`)
+3. External utility imports (`import { Cell, Address } from '@ton/core'`)
+4. Internal config imports (`import { CONTRACTS } from '../config/contracts'`)
+5. Internal hook imports (`import { useStakingInfo } from '../hooks/useStakingInfo'`)
+6. Internal component imports (`import { Header } from './components/Header'`)
+7. CSS imports (`import './App.css'`)
 
 **Path Aliases:**
-- Not configured; all imports use relative paths (`../`)
-- Common patterns:
-  - From components: `import { Header } from './components/Header'`
-  - From hooks: `import { useStakingInfo } from '../hooks/useStakingInfo'`
-  - From config: `import { CONTRACTS } from '../config/contracts'`
-
-**Example Pattern from `App.tsx`:**
-```typescript
-import { Suspense, lazy } from 'react'
-import { Header } from './components/Header'
-import { ErrorBoundary } from './components/ErrorBoundary'
-import { Markets } from './components/Markets'
-import { StatsSimple } from './components/StatsSimple'
-import { getNetworkConfig, isMainnet } from './config/networks'
-import './App.css'
-```
+- `@/*` maps to `./src/*` (configured in `tsconfig.json`)
+- Used in some files: `import { Button } from '@/components/ui/button'`
+- Relative paths still common: `import { CONTRACTS } from '../config/contracts'`
 
 ## Error Handling
 
 **Patterns:**
-- Throw custom `Error` instances with descriptive messages for validation errors
-- Use `try/catch` blocks in async functions
-- Log errors with context prefix (e.g., `[getJettonWallet]`, `[StakingInfo]`)
-- For API errors: include HTTP status code and response details
+- Try-catch blocks for async operations with console.error logging
+- Hooks return error state: `{ data, loading, error }`
+- Error boundaries for React component errors (`ErrorBoundary.tsx`)
+- Fallback UI provided via `fallback` prop or default error message
+- Graceful degradation: catch errors but continue execution where possible
 
-**Example from `useContract.ts`:**
+**Example from `useMarkets.ts`:**
 ```typescript
-const getJettonWalletAddress = async (): Promise<string | null> => {
-  if (!userAddress) return null;
-  try {
-    const response = await fetch(...);
-    if (!response.ok) {
-      console.log(`[getJettonWallet] Response not OK: ${response.status}`);
-      return null;
-    }
-    const data = await response.json();
-    // ...
-    return friendlyAddress;
-  } catch (err) {
-    console.error(`[getJettonWallet] Error:`, err);
-    return null;
-  }
-};
-```
-
-**Validation Errors:**
-```typescript
-// Throw with descriptive message
-if (bondAmount < MIN_BOND_HNCH) {
-  throw new Error(`Minimum bond is ${MIN_BOND_HNCH.toLocaleString()} HNCH`);
-}
-
-// Check wallet connection before operations
-if (!userAddress) {
-  throw new Error('Wallet not connected');
+try {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Failed to fetch');
+} catch (err: any) {
+  console.error('Failed to fetch markets:', err);
+  setError(err.message);
 }
 ```
 
-**Error Boundaries:**
-- Use class-based `ErrorBoundary` component (`/Users/tonicaradonna/thehunch-claude/app/src/components/ErrorBoundary.tsx`) to wrap sections
-- Provides custom fallback UI and error logging via `componentDidCatch`
-- All major sections use ErrorBoundary + Suspense combo
+**Example from `App.tsx`:**
+```typescript
+<ErrorBoundary name="Dashboard" fallback={<ErrorFallback name="Dashboard" />}>
+  <Suspense fallback={<LoadingFallback name="Dashboard" />}>
+    <Dashboard />
+  </Suspense>
+</ErrorBoundary>
+```
 
 ## Logging
 
-**Framework:** `console` object (no external logging library)
+**Framework:** Console API (native)
 
 **Patterns:**
-- Prefix logs with context in brackets: `[ComponentName]` or `[HookName]`
-- Use `console.log()` for informational messages (not verbose, but helpful for debugging)
-- Use `console.warn()` for rate-limit warnings
-- Use `console.error()` for actual errors
-
-**Examples:**
-```typescript
-// In useContract.ts
-console.log(`[getJettonWallet] Fetching for ${userAddress}`);
-console.log(`[getJettonWallet] Response:`, data);
-console.error(`[getJettonWallet] Error:`, err);
-
-// In useStakingInfo.ts
-console.log('[StakingInfo] Hook called, TonConnect address:', address);
-console.warn('[StakingInfo] Fee Distributor not available');
-console.error('Failed to fetch staking info:', err);
-```
-
-**When to Log:**
-- API requests and responses (including status codes)
-- Address conversions and format transformations
-- State changes in complex hooks
-- Errors and recovery attempts
-- Not recommended: Debug-level verbose logs in normal flow (only for investigation)
-
-**Rate-Limiting Context:**
-- Logs include API key configuration status and rate-limit strategy
-- Example: `'[Markets] TONAPI key configured:', hasApiKey ? 'yes' : 'no (using conservative rate limits)'`
+- Prefix logs with component/hook name: `console.log('[Markets] Instance count:', count)`
+- Debug logs for tracing: `console.log('[StakingInfo Debug] API response:', data)`
+- Error logs: `console.error('Failed to fetch markets:', err)`
+- Warning logs: `console.warn('[StakingInfo] Fee Distributor not available')`
+- Verbose logging in development (not stripped for production)
 
 ## Comments
 
 **When to Comment:**
-- Complex algorithms or address transformations (e.g., base64 decoding in `normalizeTonAddress()`)
-- Non-obvious business logic (e.g., epoch calculations in `useStakingInfo.ts`)
-- Important constraints or limitations (e.g., "Current epoch is still accumulating, so not claimable yet")
-- Contract interaction details (operation codes, payload structure)
-- Guard comments explaining why something is skipped or done differently
+- Complex blockchain data parsing logic
+- Network configuration and rate limiting
+- Contract state constants and their meanings
+- Timing calculations (epochs, lock periods)
+- Workarounds or temporary solutions
 
-**Example Comments:**
+**JSDoc/TSDoc:**
+- Not consistently used
+- Some type definitions include inline comments
+- Interface properties occasionally documented inline
+
+**Example:**
 ```typescript
 // 5 minutes delay after resolution deadline before proposals can be made
 const PROPOSAL_DELAY_SECONDS = 300;
 
-// Helper: Convert address to non-bounceable format for TONAPI queries
-// TONAPI accepts UQ... (non-bounceable) or 0:... (raw), but NOT EQ... (bounceable)
-const toNonBounceableAddress = (addressStr: string): string => {
-  // ...
-};
-
-// No automatic timer - calculate on render only to prevent memory issues
-```
-
-**JSDoc/TSDoc:**
-- Not consistently used for simple functions
-- Used for complex public functions in hooks and config modules
-- Documents parameters, return types, and important notes
-
-**Example from `useContract.ts`:**
-```typescript
-/**
- * Create a new prediction market (Oracle Instance)
- * Cost: 10,000 HNCH fee + ~0.25 TON for deployment (v1.1)
- * Fee distribution: 60% stakers, 25% creator rebate, 10% treasury, 5% resolver reward
- * @param question - The prediction question (must be YES/NO answerable)
- * @param resolutionDeadline - Unix timestamp after which outcomes can be proposed
- * @param rules - Optional rules for resolution
- * @param resolutionSource - Optional source for resolution verification
- */
-const createMarket = async (
-  question: string,
-  resolutionDeadline: number,
-  rules?: string,
-  resolutionSource?: string
-) => {
+// Helper: convert raw address (0:...) to friendly format (EQ.../kQ...) for TonAPI
+const toFriendlyAddress = (rawAddress: string, testnet = true): string => {
+  // Implementation
+}
 ```
 
 ## Function Design
 
 **Size:**
-- Prefer functions under 50 lines; complex logic broken into smaller helpers
-- Long functions exist in data-fetching hooks where unavoidable (e.g., `useStakingInfo.ts` with complex state assembly)
+- No strict limit enforced
+- Some long functions exist (e.g., `fetchMarkets()` in `useMarkets.ts` is ~530 lines)
+- Complex data fetching logic not decomposed into smaller functions
 
 **Parameters:**
-- Use destructuring for React props (enforced by TypeScript interfaces)
-- Async functions return Promises
-- Optional parameters use TypeScript `?` syntax
+- Prefer destructuring for objects: `{ name, value }: Props`
+- Optional parameters use `?` syntax: `name?: string`
+- Default parameters: `testnet = true`
 
 **Return Values:**
-- Functions explicitly type return values
-- Async functions return `Promise<T>`
-- Helper functions return appropriate types (strings, numbers, booleans, objects)
-- Error cases either throw or return null (context-dependent)
-
-**Example from `useStakingInfo.ts`:**
-```typescript
-// Clear return types and structure
-const formatBalance = (balance: string) => {
-  const num = Number(balance) / 1e9;
-  return num.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-};
-
-// Complex return object with explicit interface
-export function useStakingInfo(): StakingInfo {
-  // Implementation
-  return {
-    totalStaked,
-    formattedTotalStaked: formatBalance(totalStaked),
-    userStake,
-    // ... more properties
-  };
-}
-```
+- Hooks return objects with multiple values: `{ markets, loading, error, refetch }`
+- Components return JSX
+- Helper functions return specific types (string, number, boolean)
+- Async functions return Promises
 
 ## Module Design
 
 **Exports:**
-- Named exports are standard: `export function`, `export const`, `export interface`
-- Default exports used for React components in App.tsx (`export default App`)
-- Config modules use both named and default-like approaches (getters + constants)
+- Named exports preferred: `export function useMarkets()`
+- Default exports for components: `export default App`
+- Type exports: `export type MarketCategory = 'cricket' | 'other'`
+- Const exports for configs: `export const CONTRACTS = { ... }`
 
 **Barrel Files:**
-- No barrel files (`index.ts`) used in the codebase
-- Direct imports from specific module files
+- Not used
+- Direct imports from specific files required
 
-**Example Export Pattern from `contracts.ts`:**
-```typescript
-// Use getters to ensure fresh values
-export const CONTRACTS = {
-  get HNCH_JETTON_MASTER() {
-    return getNetworkConfig().contracts.HNCH_JETTON_MASTER;
-  },
-  // ...
-};
+## TypeScript Configuration
 
-// Direct constants
-export const FEE_CONFIG = {
-  MARKET_CREATION_FEE: 10000,
-  STAKER_SHARE: 60,
-  // ...
-} as const;
+**Strictness:**
+- `strict: false` - TypeScript strict mode DISABLED
+- `noImplicitAny: false` - Implicit any allowed
+- `noUnusedLocals: false` - Unused variables allowed
+- `noUnusedParameters: false` - Unused parameters allowed
+- `strictNullChecks: false` - Null checks disabled
+- `skipLibCheck: true` - Skip type checking of declaration files
+- `allowJs: true` - JavaScript files allowed
 
-// Function exports
-export const getNetwork = () => getNetworkConfig().name;
-```
+**Target:**
+- ES2020 for both compilation and libraries
+- Module: ESNext with bundler resolution
 
-**Pattern for Hook Exports:**
-```typescript
-// Interface first
-interface StakingInfo {
-  // properties
-}
+## React Patterns
 
-// Hook function that returns interface
-export function useStakingInfo(): StakingInfo {
-  // implementation
-  return { /* properties */ };
-}
-```
+**Component Style:**
+- Functional components only (no class components except `ErrorBoundary`)
+- Hooks for state management
+- Named exports for utilities, default exports for app components
+
+**State Management:**
+- React hooks (`useState`, `useEffect`, `useCallback`, `useRef`)
+- Zustand used (listed in dependencies) but not visible in analyzed files
+- TanStack Query (`@tanstack/react-query`) for data fetching
+
+**Lazy Loading:**
+- Used for heavy components: `const Dashboard = lazy(() => import('./components/Dashboard'))`
+- Wrapped in `Suspense` with loading fallbacks
+- Combined with `ErrorBoundary` for resilience
+
+**Refs:**
+- Used for DOM references and mutable values
+- Pattern: `const mountedRef = useRef(true)`
+- Cleanup in useEffect return: `mountedRef.current = false`
+
+## Blockchain-Specific Conventions
+
+**Address Handling:**
+- Always convert addresses for API calls: `toNonBounceableAddress()` for TonAPI
+- Use `Address.parse()` from `@ton/core` for parsing
+- Convert to appropriate format: bounceable vs non-bounceable
+- Network-aware: testnet vs mainnet formats differ
+
+**Number Parsing:**
+- BigInt for large numbers: `BigInt(value).toString()`
+- Hex to decimal conversion: `parseInt(numStr, 16)`
+- Token decimals: divide by `1e9` for HNCH
+
+**API Calls:**
+- Rate limiting awareness: batch requests, add delays between calls
+- Retry logic with exponential backoff
+- Progress tracking for long-running operations
+- Use network-specific API URLs and headers from config
 
 ---
 
-*Convention analysis: 2026-02-01*
+*Convention analysis: 2026-02-05*
