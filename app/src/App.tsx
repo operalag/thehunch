@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useState, useEffect } from 'react'
 import { Header } from './components/Header'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Markets } from './components/Markets'
@@ -10,6 +10,7 @@ import './App.css'
 const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })))
 const Stake = lazy(() => import('./components/Stake').then(m => ({ default: m.Stake })))
 const TokenFlow = lazy(() => import('./components/TokenFlow').then(m => ({ default: m.TokenFlow })))
+const Admin = lazy(() => import('./components/Admin').then(m => ({ default: m.Admin })))
 
 // Simple loading fallback
 function LoadingFallback({ name }: { name: string }) {
@@ -42,43 +43,63 @@ function ErrorFallback({ name }: { name: string }) {
 
 function App() {
   const networkConfig = getNetworkConfig();
+  const [hash, setHash] = useState(window.location.hash);
+
+  useEffect(() => {
+    const onHashChange = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const isAdmin = hash === '#admin';
 
   return (
     <div className="app">
       <Header />
       <main className="main-content">
-        {/* Dashboard - lazy loaded with error boundary */}
-        <ErrorBoundary name="Dashboard" fallback={<ErrorFallback name="Dashboard" />}>
-          <Suspense fallback={<LoadingFallback name="Dashboard" />}>
-            <Dashboard />
-          </Suspense>
-        </ErrorBoundary>
+        {isAdmin ? (
+          /* Admin panel - hidden behind #admin hash */
+          <ErrorBoundary name="Admin" fallback={<ErrorFallback name="Admin" />}>
+            <Suspense fallback={<LoadingFallback name="Admin" />}>
+              <Admin />
+            </Suspense>
+          </ErrorBoundary>
+        ) : (
+          <>
+            {/* Dashboard - lazy loaded with error boundary */}
+            <ErrorBoundary name="Dashboard" fallback={<ErrorFallback name="Dashboard" />}>
+              <Suspense fallback={<LoadingFallback name="Dashboard" />}>
+                <Dashboard />
+              </Suspense>
+            </ErrorBoundary>
 
-        {/* Markets - full interactive version with proposal, challenge, and DAO voting */}
-        <ErrorBoundary name="Markets" fallback={<ErrorFallback name="Markets" />}>
-          <Suspense fallback={<LoadingFallback name="Markets" />}>
-            <Markets />
-          </Suspense>
-        </ErrorBoundary>
+            {/* Markets - full interactive version with proposal, challenge, and DAO voting */}
+            <ErrorBoundary name="Markets" fallback={<ErrorFallback name="Markets" />}>
+              <Suspense fallback={<LoadingFallback name="Markets" />}>
+                <Markets />
+              </Suspense>
+            </ErrorBoundary>
 
-        {/* Stake - lazy loaded with error boundary */}
-        <ErrorBoundary name="Stake" fallback={<ErrorFallback name="Stake" />}>
-          <Suspense fallback={<LoadingFallback name="Stake" />}>
-            <Stake />
-          </Suspense>
-        </ErrorBoundary>
+            {/* Stake - lazy loaded with error boundary */}
+            <ErrorBoundary name="Stake" fallback={<ErrorFallback name="Stake" />}>
+              <Suspense fallback={<LoadingFallback name="Stake" />}>
+                <Stake />
+              </Suspense>
+            </ErrorBoundary>
 
-        {/* Stats - using simple crash-proof version */}
-        <ErrorBoundary name="Stats" fallback={<ErrorFallback name="Stats" />}>
-          <StatsSimple />
-        </ErrorBoundary>
+            {/* Stats - using simple crash-proof version */}
+            <ErrorBoundary name="Stats" fallback={<ErrorFallback name="Stats" />}>
+              <StatsSimple />
+            </ErrorBoundary>
 
-        {/* TokenFlow - lazy loaded with error boundary */}
-        <ErrorBoundary name="TokenFlow" fallback={<ErrorFallback name="TokenFlow" />}>
-          <Suspense fallback={<LoadingFallback name="TokenFlow" />}>
-            <TokenFlow />
-          </Suspense>
-        </ErrorBoundary>
+            {/* TokenFlow - lazy loaded with error boundary */}
+            <ErrorBoundary name="TokenFlow" fallback={<ErrorFallback name="TokenFlow" />}>
+              <Suspense fallback={<LoadingFallback name="TokenFlow" />}>
+                <TokenFlow />
+              </Suspense>
+            </ErrorBoundary>
+          </>
+        )}
       </main>
       <footer className="footer">
         <p>HUNCH Oracle - Decentralized Prediction Markets on TON</p>

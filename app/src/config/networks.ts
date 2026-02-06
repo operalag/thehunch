@@ -34,7 +34,7 @@ export const TESTNET_CONFIG: NetworkConfig = {
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
 
-// Mainnet Configuration - V6.4 deployed 2026-02-01 (FIXED: Fee Distributor V6 data structure - 4 refs)
+// Mainnet Configuration - V6.5 deployed 2026-02-05 (FIXED: Cell underflow in claim_rewards)
 export const MAINNET_CONFIG: NetworkConfig = {
   name: 'mainnet',
   displayName: 'Mainnet',
@@ -44,7 +44,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
   contracts: {
     HNCH_JETTON_MASTER: 'EQD529CGTmX1Tgcsn3vYBfUPKrVdgermb1T8o5MKLGOGdHpb',
     MASTER_ORACLE: 'EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J',
-    FEE_DISTRIBUTOR: 'EQDgNzF96F7yawAkZ83vEijSUlfA4YWuA_MS2ft_3fgrI3Ld',  // V6 with correct 4-ref storage structure
+    FEE_DISTRIBUTOR: 'EQAJmXOgU62n3hkN6RcZv1I5MIdqFqK6sFit3Z7bktKj61QU',  // V6.5 - fixed claim_rewards Cell underflow
   },
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };

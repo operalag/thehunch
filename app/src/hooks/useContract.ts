@@ -478,6 +478,25 @@ export function useContract() {
   // ============================================
 
   /**
+   * Update Fee Distributor address on Master Oracle (admin only)
+   * Required when Fee Distributor is redeployed
+   * @param newFeeDistributorAddress - The new Fee Distributor contract address
+   */
+  const setFeeDistributor = async (newFeeDistributorAddress: string) => {
+    const body = beginCell()
+      .storeUint(0x0E, 32) // op::set_fee_distributor
+      .storeUint(Date.now(), 64)
+      .storeAddress(Address.parse(newFeeDistributorAddress))
+      .endCell();
+
+    return sendTransaction(
+      CONTRACTS.MASTER_ORACLE,
+      '0.05',
+      body.toBoc().toString('base64')
+    );
+  };
+
+  /**
    * Mint HNCH tokens (admin only)
    */
   const mintTokens = async (toAddress: string, amount: bigint) => {
@@ -516,6 +535,7 @@ export function useContract() {
     counterVeto,
     finalizeVeto,
     // Admin
+    setFeeDistributor,
     mintTokens,
     // Utilities
     sendTransaction,

@@ -162,7 +162,7 @@ export function Stake() {
     setIsClaiming(true);
     try {
       await claimStakerRewards();
-      alert(`Claim request sent! ${pendingAmount.toLocaleString()} HNCH will be transferred after blockchain confirmation.`);
+      alert(`Claim transaction submitted. Check your wallet in ~15 seconds to verify the ${pendingAmount.toLocaleString()} HNCH was received.`);
       setTimeout(refetchStaking, 15000);
     } catch (error: any) {
       console.error('Failed to claim rewards:', error);
