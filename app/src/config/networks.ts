@@ -44,7 +44,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
   contracts: {
     HNCH_JETTON_MASTER: 'EQD529CGTmX1Tgcsn3vYBfUPKrVdgermb1T8o5MKLGOGdHpb',
     MASTER_ORACLE: 'EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J',
-    FEE_DISTRIBUTOR: 'EQCV9bJCGxdg2CzuOLifA7DXLl0b-uGyHH7gvQcYZC8owuLS',  // V6.6 - deployed 2026-02-08
+    FEE_DISTRIBUTOR: 'EQDd_J6o-OIFGPRdkjN6GTHe1g5noAIZpjBsXOX2KY9hKTdW',  // V6.6 recovery - epoch data migrated from V6.5
   },
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
