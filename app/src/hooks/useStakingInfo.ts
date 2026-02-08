@@ -76,6 +76,7 @@ export function useStakingInfo(): StakingInfo {
   const [userStake, setUserStake] = useState<string>('0');
   const [lockTime, setLockTime] = useState<number>(0);
   const [pendingStakerRewards, setPendingStakerRewards] = useState<string>('0');
+  const [claimableRewards, setClaimableRewards] = useState<string>('0');
   const [lastDistribution, setLastDistribution] = useState<number>(0);
   // Epoch state
   const [currentEpoch, setCurrentEpoch] = useState<number>(0);
@@ -127,6 +128,9 @@ export function useStakingInfo(): StakingInfo {
         }
       }
 
+      // Track user stake locally for get_pending_rewards call
+      let fetchedUserStake = '0';
+
       // Fetch user stake info if address is connected (using get_stake_info for amount + lock time)
       if (address) {
         try {
@@ -156,10 +160,12 @@ export function useStakingInfo(): StakingInfo {
                 const parsed = numStr.startsWith('0x') ? BigInt(numStr).toString() : numStr;
                 console.log('[StakingInfo Debug] Setting userStake to:', parsed, '(from:', numStr, ')');
                 setUserStake(parsed);
+                fetchedUserStake = parsed;
               } else if (typeof stakeValue === 'string') {
                 const parsed = stakeValue.startsWith('0x') ? BigInt(stakeValue).toString() : stakeValue;
                 console.log('[StakingInfo Debug] Setting userStake (string) to:', parsed);
                 setUserStake(parsed);
+                fetchedUserStake = parsed;
               } else {
                 console.log('[StakingInfo Debug] Could not parse stakeValue, type:', typeof stakeValue);
               }
@@ -283,6 +289,36 @@ export function useStakingInfo(): StakingInfo {
           setUserLastClaimedEpoch(-1);
         }
       }
+
+      // Fetch user's actual claimable rewards from contract (finalized epochs only)
+      if (address && fetchedUserStake !== '0') {
+        try {
+          const nonBounceableAddr = toNonBounceableAddress(address);
+          const rewardsResponse = await fetch(
+            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_pending_rewards?args=${encodeURIComponent(nonBounceableAddr)}&args=${fetchedUserStake}`,
+            { headers }
+          );
+
+          if (rewardsResponse.ok) {
+            const rewardsData = await rewardsResponse.json();
+            console.log('[StakingInfo Debug] get_pending_rewards response:', rewardsData);
+
+            if (rewardsData.exit_code === 0 && rewardsData.stack && rewardsData.stack.length >= 1) {
+              const val = rewardsData.stack[0];
+              if (typeof val === 'object' && val.num) {
+                const numStr = val.num;
+                const rewards = numStr.startsWith('0x') ? BigInt(numStr).toString() : numStr;
+                setClaimableRewards(rewards);
+              } else if (typeof val === 'string') {
+                const rewards = val.startsWith('0x') ? BigInt(val).toString() : val;
+                setClaimableRewards(rewards);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[StakingInfo] get_pending_rewards failed:', e);
+        }
+      }
     } catch (err: any) {
       console.error('Failed to fetch staking info:', err);
       setError(err.message);
@@ -316,14 +352,18 @@ export function useStakingInfo(): StakingInfo {
   const timeUntilUnlock = unlockTime > 0 ? Math.max(0, unlockTime - now) : 0;
   const canUnstake = lockTime > 0 && now >= unlockTime;
 
-  // Calculate user's proportional share of pending rewards
-  // userPendingRewards = (pendingStakerRewards * userStake) / totalStaked
+  // Calculate user's rewards
   const totalStakedNum = BigInt(totalStaked || '0');
   const userStakeNum = BigInt(userStake || '0');
   const pendingRewardsNum = BigInt(pendingStakerRewards || '0');
+  const claimableRewardsNum = BigInt(claimableRewards || '0');
 
   let userPendingRewards = '0';
-  if (totalStakedNum > 0n && userStakeNum > 0n) {
+  if (claimableRewardsNum > 0n) {
+    // Use contract-calculated rewards for finalized epochs (exact amount)
+    userPendingRewards = claimableRewards;
+  } else if (totalStakedNum > 0n && userStakeNum > 0n) {
+    // No finalized epochs to claim - show estimated share of current epoch
     const userShare = (pendingRewardsNum * userStakeNum) / totalStakedNum;
     userPendingRewards = userShare.toString();
   }
