@@ -44,7 +44,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
   contracts: {
     HNCH_JETTON_MASTER: 'EQD529CGTmX1Tgcsn3vYBfUPKrVdgermb1T8o5MKLGOGdHpb',
     MASTER_ORACLE: 'EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J',
-    FEE_DISTRIBUTOR: 'EQAJmXOgU62n3hkN6RcZv1I5MIdqFqK6sFit3Z7bktKj61QU',  // V6.6 - fixed send_jetton_transfer Cell overflow (pending deploy)
+    FEE_DISTRIBUTOR: 'EQCV9bJCGxdg2CzuOLifA7DXLl0b-uGyHH7gvQcYZC8owuLS',  // V6.6 - deployed 2026-02-08
   },
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
