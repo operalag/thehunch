@@ -270,7 +270,7 @@ export function ProfilePage({ onOpenAdmin }: { onOpenAdmin?: () => void }) {
 
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-tg-hint">Smart Contracts</span>
-            <span className="text-sm font-mono text-success">V6.5</span>
+            <span className="text-sm font-mono text-success">V6.6</span>
           </div>
 
           <div className="pt-4 border-t border-white/10">

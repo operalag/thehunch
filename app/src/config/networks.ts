@@ -34,7 +34,7 @@ export const TESTNET_CONFIG: NetworkConfig = {
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
 
-// Mainnet Configuration - V6.5 deployed 2026-02-05 (FIXED: Cell underflow in claim_rewards)
+// Mainnet Configuration - V6.6 deployed 2026-02-08 (FIXED: Cell overflow in send_jetton_transfer)
 export const MAINNET_CONFIG: NetworkConfig = {
   name: 'mainnet',
   displayName: 'Mainnet',
@@ -44,7 +44,7 @@ export const MAINNET_CONFIG: NetworkConfig = {
   contracts: {
     HNCH_JETTON_MASTER: 'EQD529CGTmX1Tgcsn3vYBfUPKrVdgermb1T8o5MKLGOGdHpb',
     MASTER_ORACLE: 'EQB4nPFKiajN2M_5ZTo83MQ9rRMUzPq0pkSEU33RH877cW3J',
-    FEE_DISTRIBUTOR: 'EQAJmXOgU62n3hkN6RcZv1I5MIdqFqK6sFit3Z7bktKj61QU',  // V6.5 - fixed claim_rewards Cell underflow
+    FEE_DISTRIBUTOR: 'EQAJmXOgU62n3hkN6RcZv1I5MIdqFqK6sFit3Z7bktKj61QU',  // V6.6 - fixed send_jetton_transfer Cell overflow (pending deploy)
   },
   manifestUrl: 'https://www.thehunch.business/tonconnect-manifest.json',
 };
