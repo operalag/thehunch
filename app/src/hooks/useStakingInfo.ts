@@ -66,6 +66,7 @@ interface StakingInfo {
   loading: boolean;
   error: string | null;
   refetch: () => void;
+  markClaimed: () => void; // Optimistic reset after successful claim
 }
 
 export function useStakingInfo(): StakingInfo {
@@ -104,8 +105,9 @@ export function useStakingInfo(): StakingInfo {
         apiUrl: apiUrl,
         hasApiKey: !!headers.Authorization
       });
+      const cacheBust = `_t=${Date.now()}`;
       const totalResponse = await fetch(
-        `${apiUrl}/blockchain/accounts/${CONTRACTS.MASTER_ORACLE}/methods/get_total_staked`,
+        `${apiUrl}/blockchain/accounts/${CONTRACTS.MASTER_ORACLE}/methods/get_total_staked?${cacheBust}`,
         { headers }
       );
 
@@ -140,7 +142,7 @@ export function useStakingInfo(): StakingInfo {
 
           // Use the get_stake_info method which returns (stake_amount, lock_time)
           const userResponse = await fetch(
-            `${apiUrl}/blockchain/accounts/${CONTRACTS.MASTER_ORACLE}/methods/get_stake_info?args=${encodeURIComponent(nonBounceableAddr)}`,
+            `${apiUrl}/blockchain/accounts/${CONTRACTS.MASTER_ORACLE}/methods/get_stake_info?args=${encodeURIComponent(nonBounceableAddr)}&${cacheBust}`,
             { headers }
           );
 
@@ -195,7 +197,7 @@ export function useStakingInfo(): StakingInfo {
       // Fetch epoch info from Fee Distributor (epoch-based rewards)
       try {
         const epochResponse = await fetch(
-          `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_epoch_info`,
+          `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_epoch_info?${cacheBust}`,
           { headers }
         );
 
@@ -261,7 +263,7 @@ export function useStakingInfo(): StakingInfo {
           // Use non-bounceable format for TONAPI
           const nonBounceableAddr = toNonBounceableAddress(address);
           const claimResponse = await fetch(
-            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_user_last_claim?args=${encodeURIComponent(nonBounceableAddr)}`,
+            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_user_last_claim?args=${encodeURIComponent(nonBounceableAddr)}&${cacheBust}`,
             { headers }
           );
 
@@ -295,7 +297,7 @@ export function useStakingInfo(): StakingInfo {
         try {
           const nonBounceableAddr = toNonBounceableAddress(address);
           const rewardsResponse = await fetch(
-            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_pending_rewards?args=${encodeURIComponent(nonBounceableAddr)}&args=${fetchedUserStake}`,
+            `${apiUrl}/blockchain/accounts/${CONTRACTS.FEE_DISTRIBUTOR}/methods/get_pending_rewards?args=${encodeURIComponent(nonBounceableAddr)}&args=${fetchedUserStake}&${cacheBust}`,
             { headers }
           );
 
@@ -421,6 +423,13 @@ export function useStakingInfo(): StakingInfo {
     }
   }
 
+  // Optimistic reset after successful claim: zero out rewards and update last claimed epoch
+  const markClaimed = () => {
+    console.log('[StakingInfo] markClaimed: optimistic reset, setting claimable to 0, lastClaimed to', actualCurrentEpoch - 1);
+    setClaimableRewards('0');
+    setUserLastClaimedEpoch(actualCurrentEpoch - 1);
+  };
+
   // Debug log to trace final values
   console.log('[StakingInfo] Returning values:', {
     userStake,
@@ -459,5 +468,6 @@ export function useStakingInfo(): StakingInfo {
     loading,
     error,
     refetch: fetchStakingInfo,
+    markClaimed,
   };
 }

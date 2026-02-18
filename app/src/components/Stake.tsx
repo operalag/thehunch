@@ -67,7 +67,8 @@ export function Stake() {
     claimableEpochs,
     feeDistributorAvailable,
     loading: stakingLoading,
-    refetch: refetchStaking
+    refetch: refetchStaking,
+    markClaimed
   } = useStakingInfo();
 
   const [amount, setAmount] = useState('');
@@ -162,8 +163,12 @@ export function Stake() {
     setIsClaiming(true);
     try {
       await claimStakerRewards();
-      alert(`Claim transaction submitted. Check your wallet in ~15 seconds to verify the ${pendingAmount.toLocaleString()} HNCH was received.`);
-      setTimeout(refetchStaking, 15000);
+      // Optimistic update: immediately zero out rewards in UI
+      markClaimed();
+      alert(`Claim transaction submitted! ${pendingAmount.toLocaleString()} HNCH will arrive in your wallet shortly.`);
+      // Staggered refetches to sync with on-chain state after TONAPI cache clears
+      setTimeout(refetchStaking, 30000);
+      setTimeout(refetchStaking, 60000);
     } catch (error: any) {
       console.error('Failed to claim rewards:', error);
       alert(error.message || 'Failed to claim rewards. Please try again.');
