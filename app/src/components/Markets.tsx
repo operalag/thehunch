@@ -913,6 +913,16 @@ export function Markets() {
   return (
     <section className="markets" id="markets">
       <h2>Prediction Markets</h2>
+      <div className="info-box">
+        <h4>How TheHunch fits with TheMoon</h4>
+        <p>
+          TheHunch is the oracle layer. Once a market reaches its resolution deadline,
+          trading should stop on TheMoon and this oracle process determines the final outcome.
+        </p>
+        <p>
+          Use this page to create markets, follow proposal and challenge windows, and understand exactly what happens next.
+        </p>
+      </div>
 
       {wallet && (
         <>
@@ -926,7 +936,7 @@ export function Markets() {
           <div className="create-market">
             <h3>Create New Market</h3>
             <p className="form-description">
-              Creating a market costs ~0.5 TON for deployment. After the resolution date, anyone can propose outcomes by bonding HNCH tokens.
+              Creating a market costs ~0.5 TON for deployment. After the resolution date, trading should lock on TheMoon and anyone can propose outcomes here by bonding HNCH tokens.
             </p>
             <form onSubmit={handleCreateMarket}>
               <div className="form-group">
@@ -1037,8 +1047,8 @@ export function Markets() {
           <h3>Markets ({filteredMarkets.length} of {fetchedMarkets.length})</h3>
           <div className="markets-header-actions">
             <div className="sync-info-tooltip">
-              <span className="info-icon" title="New markets appear within 5 minutes of creation on the blockchain">ℹ️</span>
-              <span className="info-text">New markets auto-sync every 120 minutes</span>
+              <span className="info-icon" title="New markets usually appear within 5 minutes of creation on the blockchain">ℹ️</span>
+              <span className="info-text">New markets auto-sync every 5 minutes</span>
             </div>
             <button
               className="btn-sync"
